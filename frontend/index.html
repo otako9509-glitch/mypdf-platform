@@ -693,5 +693,16 @@
 
         window.addEventListener('beforeunload', stopPolling);
     </script>
+    <!-- استدعاء ملفات الاتصال بالباك إند -->
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // فحص الاتصال بالخادم عند فتح الصفحة
+    ApiService.checkHealth().then(data => {
+      if (data) {
+        console.log('✅ متصل بسيرفر Render بنجاح:', data);
+      }
+    });
+  </script>
 </body>
 </html>
