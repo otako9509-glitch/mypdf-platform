@@ -1,0 +1,142 @@
+{
+  "app": {
+    "name": "MyPDF",
+    "tagline": "Professional PDF Tools for Everyone",
+    "description": "Merge, split, compress, and protect your PDF files with ease and security."
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "All Tools",
+    "security": "Security",
+    "about": "About",
+    "login": "Login"
+  },
+  "hero": {
+    "title": "All PDF Tools in One Secure Platform",
+    "subtitle": "Merge, split, compress, and protect your files seamlessly with complete commitment to security and data privacy."
+  },
+  "tools": {
+    "catalog": {
+      "title": "Complete PDF Tools Catalog",
+      "description": "Browse all available tools to handle your documents professionally."
+    },
+    "merge": {
+      "title": "Merge PDF",
+      "description": "Combine multiple files into one consistent document.",
+      "upload": "Upload PDF files to merge",
+      "processing": "Merging your PDF files...",
+      "success": "PDF merged successfully!",
+      "error": "Failed to merge PDF"
+    },
+    "split": {
+      "title": "Split PDF",
+      "description": "Extract pages or separate document into independent files.",
+      "upload": "Upload PDF to split",
+      "processing": "Splitting your PDF...",
+      "success": "PDF split successfully!",
+      "error": "Failed to split PDF"
+    },
+    "compress": {
+      "title": "Compress PDF",
+      "description": "Reduce file size to maximum while maintaining high quality.",
+      "upload": "Upload PDF to compress",
+      "processing": "Compressing your PDF...",
+      "success": "PDF compressed successfully!",
+      "error": "Failed to compress PDF"
+    },
+    "rotate": {
+      "title": "Rotate PDF",
+      "description": "Rotate PDF pages by 90, 180, or 270 degrees.",
+      "upload": "Upload PDF to rotate",
+      "processing": "Rotating your PDF...",
+      "success": "PDF rotated successfully!",
+      "error": "Failed to rotate PDF"
+    },
+    "organize": {
+      "title": "Organize PDF",
+      "description": "Reorder, delete, or extract pages from your PDF.",
+      "upload": "Upload PDF to organize",
+      "processing": "Organizing your PDF...",
+      "success": "PDF organized successfully!",
+      "error": "Failed to organize PDF"
+    },
+    "pdf_to_jpg": {
+      "title": "PDF to JPG",
+      "description": "Convert PDF pages to high-quality images.",
+      "upload": "Upload PDF to convert",
+      "processing": "Converting your PDF to images...",
+      "success": "PDF converted to images successfully!",
+      "error": "Failed to convert PDF to images"
+    },
+    "jpg_to_pdf": {
+      "title": "JPG to PDF",
+      "description": "Combine images into a single PDF document.",
+      "upload": "Upload images to convert",
+      "processing": "Converting images to PDF...",
+      "success": "Images converted to PDF successfully!",
+      "error": "Failed to convert images to PDF"
+    },
+    "watermark": {
+      "title": "Watermark PDF",
+      "description": "Add text or image watermark with opacity control.",
+      "upload": "Upload PDF to watermark",
+      "processing": "Adding watermark to your PDF...",
+      "success": "Watermark added successfully!",
+      "error": "Failed to add watermark"
+    },
+    "protect": {
+      "title": "Protect PDF",
+      "description": "Encrypt PDF with AES-128/256 password protection.",
+      "upload": "Upload PDF to protect",
+      "processing": "Protecting your PDF...",
+      "success": "PDF protected successfully!",
+      "error": "Failed to protect PDF"
+    },
+    "unlock": {
+      "title": "Unlock PDF",
+      "description": "Remove password protection from your PDF.",
+      "upload": "Upload PDF to unlock",
+      "processing": "Unlocking your PDF...",
+      "success": "PDF unlocked successfully!",
+      "error": "Failed to unlock PDF"
+    }
+  },
+  "upload": {
+    "title": "Upload Files",
+    "dragDrop": "Drag and drop files here or click to browse",
+    "browse": "Browse Files",
+    "remove": "Remove",
+    "processing": "Processing...",
+    "complete": "Complete",
+    "failed": "Failed"
+  },
+  "actions": {
+    "start": "Start Processing",
+    "download": "Download Result",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "close": "Close"
+  },
+  "status": {
+    "queued": "Queued",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "trust": {
+    "encryption": "Full Data Encryption (TLS 1.3)",
+    "autoDelete": "Automatic file deletion within 2 hours",
+    "privacy": "Compliance with strict privacy standards"
+  },
+  "footer": {
+    "copyright": "© 2026 MyPDF. All rights reserved.",
+    "description": "Advanced cloud platform for PDF document processing"
+  },
+  "errors": {
+    "invalidFileType": "Please select PDF files only.",
+    "serverError": "Server error. Please try again.",
+    "networkError": "Network error. Please check your connection.",
+    "timeout": "Request timeout. Please try again."
+  },
+  "comingSoon": "Coming Soon"
+}

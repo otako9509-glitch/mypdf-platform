@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize PDF - MyPDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-header h2 { font-size: 32px; margin-bottom: 12px; color: #fff; }
+        .tool-header p { color: var(--text-muted); font-size: 16px; }
+        .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 60px 20px; text-align: center; background: rgba(255, 255, 255, 0.02); cursor: pointer; transition: all 0.3s; margin-bottom: 30px; }
+        .dropzone:hover { border-color: var(--primary); background: rgba(229, 50, 45, 0.05); }
+        .dropzone.dragover { border-color: var(--primary); background: rgba(229, 50, 45, 0.1); }
+        .dropzone i { font-size: 48px; color: var(--primary); margin-bottom: 16px; }
+        .dropzone p { color: var(--text-muted); font-size: 16px; }
+        .page-organizer { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 30px; display: none; }
+        .page-organizer.active { display: block; }
+        .page-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .page-item { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; cursor: move; position: relative; }
+        .page-item:hover { border-color: var(--primary); }
+        .page-item.dragging { opacity: 0.5; }
+        .page-number { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+        .page-preview { height: 120px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; }
+        .page-actions { margin-top: 8px; display: flex; gap: 8px; justify-content: center; }
+        .page-action-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; }
+        .page-action-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+        .page-action-btn.delete:hover { color: #e5322d; }
+        .action-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 30px; }
+        .btn { padding: 12px 32px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-size: 16px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-secondary:hover { color: #fff; border-color: #fff; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .progress-container { display: none; margin-bottom: 30px; }
+        .progress-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+        .progress-text { text-align: center; color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+        .result-container { display: none; text-align: center; padding: 40px; background: rgba(21, 87, 36, 0.1); border: 1px solid rgba(21, 87, 36, 0.3); border-radius: 12px; }
+        .result-container i { font-size: 48px; color: #2ecc71; margin-bottom: 16px; }
+        .result-container h3 { color: #fff; margin-bottom: 16px; }
+        .download-btn { display: inline-flex; align-items: center; gap: 8px; background: #2ecc71; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+        .download-btn:hover { background: #27ae60; }
+        #statusAlert { max-width: 1200px; margin: 0 auto 20px; padding: 12px 20px; border-radius: 8px; display: none; font-weight: 600; text-align: center; }
+        .alert-success { background: rgba(21, 87, 36, 0.85); color: #d4edda; }
+        .alert-error { background: rgba(114, 28, 36, 0.85); color: #f8d7da; }
+        .alert-info { background: rgba(12, 84, 96, 0.85); color: #d1ecf1; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="star-bg"><div id="stars"></div><div id="stars2"></div><div id="stars3"></div></div>
+    <header>
+        <a href="../index.html" class="brand"><i class="fa-solid fa-file-pdf fa-xl"></i><h1 data-i18n="app.name">MyPDF</h1></a>
+        <ul class="nav-links">
+            <li><a href="tools.html" data-i18n="nav.tools">All Tools</a></li>
+            <li><button id="langToggle" class="lang-btn">العربية</button></li>
+            <li><a href="../index.html" class="nav-btn" data-i18n="nav.home">Home</a></li>
+        </ul>
+    </header>
+    <div id="statusAlert"></div>
+    <div class="tool-container">
+        <div class="tool-header">
+            <h2 data-i18n="tools.organize.title">Organize PDF</h2>
+            <p data-i18n="tools.organize.description">Reorder, delete, or extract pages from your PDF.</p>
+        </div>
+        <div class="dropzone" id="dropzone"><i class="fa-solid fa-cloud-arrow-up"></i><p data-i18n="upload.dragDrop">Drag and drop files here or click to browse</p></div>
+        <input type="file" id="fileInput" accept=".pdf" />
+        <div class="page-organizer" id="pageOrganizer">
+            <div class="page-list" id="pageList"></div>
+            <p style="color: var(--text-muted); font-size: 14px; text-align: center;">Drag pages to reorder. Use buttons to delete or extract pages.</p>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" id="clearBtn" data-i18n="actions.cancel">Clear</button>
+            <button class="btn btn-primary" id="organizeBtn" disabled data-i18n="actions.start">Organize PDF</button>
+        </div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3 data-i18n="tools.organize.success">PDF organized successfully!</h3>
+            <a href="#" class="download-btn" id="downloadBtn" data-i18n="actions.download"><i class="fa-solid fa-download"></i> Download Result</a>
+        </div>
+    </div>
+    <script src="../js/i18n.js"></script>
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const pageOrganizer = document.getElementById('pageOrganizer');
+        const pageList = document.getElementById('pageList');
+        const organizeBtn = document.getElementById('organizeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultContainer = document.getElementById('resultContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const langToggle = document.getElementById('langToggle');
+        const alertBox = document.getElementById('statusAlert');
+        let selectedFile = null;
+        let currentJobId = null;
+        let pages = [];
+        let draggedItem = null;
+
+        langToggle.addEventListener('click', async () => {
+            const newLang = i18n.currentLang === 'en' ? 'ar' : 'en';
+            await i18n.setLanguage(newLang);
+        });
+
+        function showMessage(msg, type) {
+            alertBox.style.display = 'block';
+            alertBox.className = `alert-${type}`;
+            alertBox.innerHTML = msg;
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && (files[0].type === 'application/pdf' || files[0].name.toLowerCase().endsWith('.pdf'))) {
+                selectedFile = files[0];
+                dropzone.innerHTML = `<i class="fa-solid fa-file-pdf"></i><p>${selectedFile.name}</p>`;
+                initializePages();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                dropzone.innerHTML = `<i class="fa-solid fa-file-pdf"></i><p>${selectedFile.name}</p>`;
+                initializePages();
+            }
+        });
+
+        function initializePages() {
+            // Mock page initialization - in real implementation, this would read actual PDF pages
+            pages = Array.from({ length: 5 }, (_, i) => ({ id: i + 1, number: i + 1, action: 'keep' }));
+            renderPages();
+            pageOrganizer.classList.add('active');
+            organizeBtn.disabled = false;
+        }
+
+        function renderPages() {
+            pageList.innerHTML = '';
+            pages.forEach((page, index) => {
+                if (page.action === 'delete') return;
+                
+                const pageItem = document.createElement('div');
+                pageItem.className = 'page-item';
+                pageItem.draggable = true;
+                pageItem.dataset.index = index;
+                pageItem.innerHTML = `
+                    <div class="page-number">Page ${page.number}</div>
+                    <div class="page-preview"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="page-actions">
+                        <button class="page-action-btn delete" onclick="deletePage(${index})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                
+                pageItem.addEventListener('dragstart', handleDragStart);
+                pageItem.addEventListener('dragend', handleDragEnd);
+                pageItem.addEventListener('dragover', handleDragOver);
+                pageItem.addEventListener('drop', handleDrop);
+                
+                pageList.appendChild(pageItem);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedItem = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (this !== draggedItem) {
+                this.style.border = '2px dashed var(--primary)';
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.style.border = '1px solid var(--border)';
+            
+            if (this !== draggedItem) {
+                const fromIndex = parseInt(draggedItem.dataset.index);
+                const toIndex = parseInt(this.dataset.index);
+                
+                const [movedPage] = pages.splice(fromIndex, 1);
+                pages.splice(toIndex, 0, movedPage);
+                
+                renderPages();
+            }
+        }
+
+        function deletePage(index) {
+            pages[index].action = 'delete';
+            renderPages();
+        }
+
+        clearBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            dropzone.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><p data-i18n="upload.dragDrop">Drag and drop files here or click to browse</p>`;
+            pageOrganizer.classList.remove('active');
+            pages = [];
+            organizeBtn.disabled = true;
+            resetUI();
+        });
+
+        function resetUI() {
+            progressContainer.style.display = 'none';
+            resultContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+        }
+
+        organizeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            resetUI();
+            progressContainer.style.display = 'block';
+            organizeBtn.disabled = true;
+
+            const pageOrder = pages.filter(p => p.action !== 'delete').map(p => p.number);
+            const formData = new FormData();
+            formData.append('files', selectedFile);
+            formData.append('operation', 'organize');
+            formData.append('page_order', JSON.stringify(pageOrder));
+
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    currentJobId = data.job_id;
+                    pollJobStatus(currentJobId);
+                } else {
+                    showMessage(`❌ ${i18n.t('errors.serverError')}: ${data.detail || i18n.t('upload.failed')}`, 'error');
+                    organizeBtn.disabled = false;
+                }
+            } catch (err) {
+                showMessage(`❌ ${i18n.t('errors.networkError')}`, 'error');
+                organizeBtn.disabled = false;
+            }
+        });
+
+        async function pollJobStatus(jobId) {
+            const maxAttempts = 60;
+            let attempts = 0;
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                const progress = Math.min((attempts / maxAttempts) * 100, 90);
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${i18n.t('upload.processing')} (${attempts}/${maxAttempts})`;
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/v1/jobs/${jobId}`);
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        const job = data.job;
+                        if (job.status === 'PROCESSING') {
+                        } else if (job.status === 'COMPLETED') {
+                            clearInterval(pollInterval);
+                            progressFill.style.width = '100%';
+                            progressContainer.style.display = 'none';
+                            resultContainer.style.display = 'block';
+                            downloadBtn.href = `http://localhost:8080/api/v1/download/${job.output_file}`;
+                            organizeBtn.disabled = false;
+                        } else if (job.status === 'FAILED') {
+                            clearInterval(pollInterval);
+                            showMessage(`❌ ${i18n.t('status.failed')}: ${job.error || i18n.t('errors.serverError')}`, 'error');
+                            progressContainer.style.display = 'none';
+                            organizeBtn.disabled = false;
+                        }
+                    } else {
+                        clearInterval(pollInterval);
+                        showMessage(`❌ ${i18n.t('errors.serverError')}`, 'error');
+                        progressContainer.style.display = 'none';
+                        organizeBtn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Polling error:', err);
+                }
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    showMessage(`⏱️ ${i18n.t('errors.timeout')}`, 'error');
+                    progressContainer.style.display = 'none';
+                    organizeBtn.disabled = false;
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* RTL Specific Styles for Arabic */
+
+/* Mirror flex containers */
+[dir="rtl"] .brand {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .nav-links {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .tools-grid {
+    direction: rtl;
+}
+
+[dir="rtl"] .tool-card::before {
+    right: auto;
+    left: 0;
+    border-radius: 0 0 100% 0;
+}
+
+[dir="rtl"] .tool-card::after {
+    left: auto;
+    right: 0;
+    border-radius: 0 12px 100% 0;
+}
+
+[dir="rtl"] .tool-card:hover::before {
+    border-radius: 12px;
+}
+
+[dir="rtl"] .tool-card:hover::after {
+    border-radius: 12px;
+}
+
+/* Mirror trust section */
+[dir="rtl"] .trust-section {
+    flex-direction: row-reverse;
+}
+
+/* Mirror footer columns */
+[dir="rtl"] .footer-content {
+    direction: rtl;
+}
+
+[dir="rtl"] .footer-bottom {
+    flex-direction: row-reverse;
+}
+
+/* Mirror modal content */
+[dir="rtl"] #loginModal > div {
+    direction: rtl;
+}
+
+/* Mirror file list and upload areas */
+[dir="rtl"] .file-list {
+    direction: rtl;
+}
+
+[dir="rtl"] .file-item {
+    flex-direction: row-reverse;
+}
+
+/* Mirror progress bar */
+[dir="rtl"] .progress-container {
+    direction: rtl;
+}
+
+/* Mirror tool-specific settings */
+[dir="rtl"] .tool-settings {
+    direction: rtl;
+}
+
+[dir="rtl"] .setting-row {
+    flex-direction: row-reverse;
+}
+
+/* Mirror action buttons */
+[dir="rtl"] .action-buttons {
+    flex-direction: row-reverse;
+}
+
+/* Mirror download section */
+[dir="rtl"] .download-section {
+    direction: rtl;
+}
+
+/* Fix text alignment for Arabic */
+[dir="rtl"] body {
+    text-align: right;
+}
+
+[dir="rtl"] h1, 
+[dir="rtl"] h2, 
+[dir="rtl"] h3, 
+[dir="rtl"] h4 {
+    text-align: right;
+}
+
+[dir="rtl"] p {
+    text-align: right;
+}
+
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+    text-align: right;
+}
+
+/* Mirror pagination and navigation */
+[dir="rtl"] .pagination {
+    flex-direction: row-reverse;
+}
+
+/* Mirror alerts and notifications */
+[dir="rtl"] #statusAlert {
+    text-align: right;
+}
+
+/* Mirror dropdown menus */
+[dir="rtl"] .dropdown-menu {
+    right: auto;
+    left: 0;
+}
+
+/* Mirror tooltips */
+[dir="rtl"] .tooltip {
+    right: auto;
+    left: 0;
+}
+
+/* Mirror checkboxes and radio buttons */
+[dir="rtl"] .checkbox-label,
+[dir="rtl"] .radio-label {
+    flex-direction: row-reverse;
+}
+
+/* Mirror tables */
+[dir="rtl"] table {
+    direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+    text-align: right;
+}
+
+/* Mirror badges and tags */
+[dir="rtl"] .badge,
+[dir="rtl"] .tag {
+    margin-left: 0;
+    margin-right: 0.5rem;
+}
+
+/* Mirror icon spacing */
+[dir="rtl"] .icon-left {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+[dir="rtl"] .icon-right {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}

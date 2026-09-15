@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge PDF - MyPDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .tool-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .tool-header h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        
+        .tool-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+        
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(229, 50, 45, 0.05);
+        }
+        
+        .dropzone.dragover {
+            border-color: var(--primary);
+            background: rgba(229, 50, 45, 0.1);
+        }
+        
+        .dropzone i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        .dropzone p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .file-list {
+            margin-bottom: 30px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .file-info i {
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        .file-name {
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .file-size {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: #e5322d;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .remove-btn:hover {
+            background: rgba(229, 50, 45, 0.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            color: #fff;
+            border-color: #fff;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            display: none;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: rgba(21, 87, 36, 0.1);
+            border: 1px solid rgba(21, 87, 36, 0.3);
+            border-radius: 12px;
+        }
+        
+        .result-container i {
+            font-size: 48px;
+            color: #2ecc71;
+            margin-bottom: 16px;
+        }
+        
+        .result-container h3 {
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .download-btn:hover {
+            background: #27ae60;
+        }
+        
+        #statusAlert {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .alert-success { background: rgba(21, 87, 36, 0.85); color: #d4edda; }
+        .alert-error { background: rgba(114, 28, 36, 0.85); color: #f8d7da; }
+        .alert-info { background: rgba(12, 84, 96, 0.85); color: #d1ecf1; }
+        
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="star-bg">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+    </div>
+
+    <header>
+        <a href="../index.html" class="brand">
+            <i class="fa-solid fa-file-pdf fa-xl"></i>
+            <h1 data-i18n="app.name">MyPDF</h1>
+        </a>
+        <ul class="nav-links">
+            <li><a href="tools.html" data-i18n="nav.tools">All Tools</a></li>
+            <li><button id="langToggle" class="lang-btn">العربية</button></li>
+            <li><a href="../index.html" class="nav-btn" data-i18n="nav.home">Home</a></li>
+        </ul>
+    </header>
+
+    <div id="statusAlert"></div>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h2 data-i18n="tools.merge.title">Merge PDF</h2>
+            <p data-i18n="tools.merge.description">Combine multiple files into one consistent document.</p>
+        </div>
+
+        <div class="dropzone" id="dropzone">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p data-i18n="upload.dragDrop">Drag and drop files here or click to browse</p>
+        </div>
+
+        <input type="file" id="fileInput" accept=".pdf" multiple />
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" id="clearBtn" data-i18n="actions.cancel">Clear All</button>
+            <button class="btn btn-primary" id="mergeBtn" disabled data-i18n="actions.start">Merge PDFs</button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3 data-i18n="tools.merge.success">PDF merged successfully!</h3>
+            <a href="#" class="download-btn" id="downloadBtn" data-i18n="actions.download">
+                <i class="fa-solid fa-download"></i> Download Result
+            </a>
+        </div>
+    </div>
+
+    <script src="../js/i18n.js"></script>
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultContainer = document.getElementById('resultContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const langToggle = document.getElementById('langToggle');
+        const alertBox = document.getElementById('statusAlert');
+
+        let selectedFiles = [];
+        let currentJobId = null;
+
+        // Language toggle
+        langToggle.addEventListener('click', async () => {
+            const newLang = i18n.currentLang === 'en' ? 'ar' : 'en';
+            await i18n.setLanguage(newLang);
+        });
+
+        // Alert management
+        function showMessage(msg, type) {
+            alertBox.style.display = 'block';
+            alertBox.className = `alert-${type}`;
+            alertBox.innerHTML = msg;
+        }
+
+        // File handling
+        dropzone.addEventListener('click', () => fileInput.click());
+        
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                    selectedFiles.push(file);
+                }
+            }
+            updateFileList();
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFile(${index})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            mergeBtn.disabled = selectedFiles.length < 2;
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        clearBtn.addEventListener('click', () => {
+            selectedFiles = [];
+            updateFileList();
+            resetUI();
+        });
+
+        function resetUI() {
+            progressContainer.style.display = 'none';
+            resultContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+        }
+
+        // Merge functionality
+        mergeBtn.addEventListener('click', async () => {
+            if (selectedFiles.length < 2) return;
+
+            resetUI();
+            progressContainer.style.display = 'block';
+            mergeBtn.disabled = true;
+
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+            formData.append('operation', 'merge');
+
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    currentJobId = data.job_id;
+                    pollJobStatus(currentJobId);
+                } else {
+                    showMessage(`❌ ${i18n.t('errors.serverError')}: ${data.detail || i18n.t('upload.failed')}`, 'error');
+                    mergeBtn.disabled = false;
+                }
+            } catch (err) {
+                showMessage(`❌ ${i18n.t('errors.networkError')}`, 'error');
+                mergeBtn.disabled = false;
+            }
+        });
+
+        async function pollJobStatus(jobId) {
+            const maxAttempts = 60;
+            let attempts = 0;
+
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                const progress = Math.min((attempts / maxAttempts) * 100, 90);
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${i18n.t('upload.processing')} (${attempts}/${maxAttempts})`;
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/v1/jobs/${jobId}`);
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        const job = data.job;
+                        const status = job.status;
+                        
+                        if (status === 'PROCESSING') {
+                            // Continue polling
+                        } else if (status === 'COMPLETED') {
+                            clearInterval(pollInterval);
+                            progressFill.style.width = '100%';
+                            progressContainer.style.display = 'none';
+                            resultContainer.style.display = 'block';
+                            downloadBtn.href = `http://localhost:8080/api/v1/download/${job.output_file}`;
+                            mergeBtn.disabled = false;
+                        } else if (status === 'FAILED') {
+                            clearInterval(pollInterval);
+                            showMessage(`❌ ${i18n.t('status.failed')}: ${job.error || i18n.t('errors.serverError')}`, 'error');
+                            progressContainer.style.display = 'none';
+                            mergeBtn.disabled = false;
+                        }
+                    } else {
+                        clearInterval(pollInterval);
+                        showMessage(`❌ ${i18n.t('errors.serverError')}`, 'error');
+                        progressContainer.style.display = 'none';
+                        mergeBtn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Polling error:', err);
+                }
+                
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    showMessage(`⏱️ ${i18n.t('errors.timeout')}`, 'error');
+                    progressContainer.style.display = 'none';
+                    mergeBtn.disabled = false;
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

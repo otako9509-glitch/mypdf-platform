@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watermark PDF - MyPDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .tool-header { text-align: center; margin-bottom: 40px; }
+        .tool-header h2 { font-size: 32px; margin-bottom: 12px; color: #fff; }
+        .tool-header p { color: var(--text-muted); font-size: 16px; }
+        .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 60px 20px; text-align: center; background: rgba(255, 255, 255, 0.02); cursor: pointer; transition: all 0.3s; margin-bottom: 30px; }
+        .dropzone:hover { border-color: var(--primary); background: rgba(229, 50, 45, 0.05); }
+        .dropzone.dragover { border-color: var(--primary); background: rgba(229, 50, 45, 0.1); }
+        .dropzone i { font-size: 48px; color: var(--primary); margin-bottom: 16px; }
+        .dropzone p { color: var(--text-muted); font-size: 16px; }
+        .tool-settings { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+        .setting-row { margin-bottom: 20px; }
+        .setting-row label { display: block; color: #fff; margin-bottom: 8px; font-weight: 600; }
+        .setting-row input, .setting-row select, .setting-row textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.05); color: #fff; outline: none; }
+        .setting-row textarea { resize: vertical; min-height: 80px; }
+        .setting-row input[type="range"] { padding: 0; }
+        .setting-row input[type="color"] { height: 40px; cursor: pointer; }
+        .action-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 30px; }
+        .btn { padding: 12px 32px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-size: 16px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-secondary:hover { color: #fff; border-color: #fff; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .progress-container { display: none; margin-bottom: 30px; }
+        .progress-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+        .progress-text { text-align: center; color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+        .result-container { display: none; text-align: center; padding: 40px; background: rgba(21, 87, 36, 0.1); border: 1px solid rgba(21, 87, 36, 0.3); border-radius: 12px; }
+        .result-container i { font-size: 48px; color: #2ecc71; margin-bottom: 16px; }
+        .result-container h3 { color: #fff; margin-bottom: 16px; }
+        .download-btn { display: inline-flex; align-items: center; gap: 8px; background: #2ecc71; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+        .download-btn:hover { background: #27ae60; }
+        #statusAlert { max-width: 900px; margin: 0 auto 20px; padding: 12px 20px; border-radius: 8px; display: none; font-weight: 600; text-align: center; }
+        .alert-success { background: rgba(21, 87, 36, 0.85); color: #d4edda; }
+        .alert-error { background: rgba(114, 28, 36, 0.85); color: #f8d7da; }
+        .alert-info { background: rgba(12, 84, 96, 0.85); color: #d1ecf1; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="star-bg"><div id="stars"></div><div id="stars2"></div><div id="stars3"></div></div>
+    <header>
+        <a href="../index.html" class="brand"><i class="fa-solid fa-file-pdf fa-xl"></i><h1 data-i18n="app.name">MyPDF</h1></a>
+        <ul class="nav-links">
+            <li><a href="tools.html" data-i18n="nav.tools">All Tools</a></li>
+            <li><button id="langToggle" class="lang-btn">العربية</button></li>
+            <li><a href="../index.html" class="nav-btn" data-i18n="nav.home">Home</a></li>
+        </ul>
+    </header>
+    <div id="statusAlert"></div>
+    <div class="tool-container">
+        <div class="tool-header">
+            <h2 data-i18n="tools.watermark.title">Watermark PDF</h2>
+            <p data-i18n="tools.watermark.description">Add text or image watermark with opacity control.</p>
+        </div>
+        <div class="dropzone" id="dropzone"><i class="fa-solid fa-cloud-arrow-up"></i><p data-i18n="upload.dragDrop">Drag and drop files here or click to browse</p></div>
+        <input type="file" id="fileInput" accept=".pdf" />
+        <div class="tool-settings">
+            <div class="setting-row">
+                <label data-i18n="tools.watermark.settings.type">Watermark Type</label>
+                <select id="watermarkType">
+                    <option value="text">Text Watermark</option>
+                    <option value="image">Image Watermark</option>
+                </select>
+            </div>
+            <div class="setting-row" id="textSettings">
+                <label data-i18n="tools.watermark.settings.text">Watermark Text</label>
+                <textarea id="watermarkText" placeholder="Enter watermark text...">CONFIDENTIAL</textarea>
+            </div>
+            <div class="setting-row" id="imageSettings" style="display: none;">
+                <label data-i18n="tools.watermark.settings.image">Upload Watermark Image</label>
+                <input type="file" id="watermarkImage" accept="image/*" />
+            </div>
+            <div class="setting-row">
+                <label data-i18n="tools.watermark.settings.opacity">Opacity: <span id="opacityValue">50</span>%</label>
+                <input type="range" id="watermarkOpacity" min="10" max="100" value="50" />
+            </div>
+            <div class="setting-row">
+                <label data-i18n="tools.watermark.settings.position">Position</label>
+                <select id="watermarkPosition">
+                    <option value="center">Center</option>
+                    <option value="top-left">Top Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="tile">Tile (Repeat)</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <label data-i18n="tools.watermark.settings.rotation">Rotation: <span id="rotationValue">0</span>°</label>
+                <input type="range" id="watermarkRotation" min="0" max="360" value="0" />
+            </div>
+            <div class="setting-row">
+                <label data-i18n="tools.watermark.settings.color">Text Color</label>
+                <input type="color" id="watermarkColor" value="#FF0000" />
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" id="clearBtn" data-i18n="actions.cancel">Clear</button>
+            <button class="btn btn-primary" id="watermarkBtn" disabled data-i18n="actions.start">Add Watermark</button>
+        </div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3 data-i18n="tools.watermark.success">Watermark added successfully!</h3>
+            <a href="#" class="download-btn" id="downloadBtn" data-i18n="actions.download"><i class="fa-solid fa-download"></i> Download Result</a>
+        </div>
+    </div>
+    <script src="../js/i18n.js"></script>
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const watermarkType = document.getElementById('watermarkType');
+        const textSettings = document.getElementById('textSettings');
+        const imageSettings = document.getElementById('imageSettings');
+        const watermarkOpacity = document.getElementById('watermarkOpacity');
+        const opacityValue = document.getElementById('opacityValue');
+        const watermarkRotation = document.getElementById('watermarkRotation');
+        const rotationValue = document.getElementById('rotationValue');
+        const watermarkBtn = document.getElementById('watermarkBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultContainer = document.getElementById('resultContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const langToggle = document.getElementById('langToggle');
+        const alertBox = document.getElementById('statusAlert');
+        let selectedFile = null;
+        let watermarkImageFile = null;
+        let currentJobId = null;
+
+        langToggle.addEventListener('click', async () => {
+            const newLang = i18n.currentLang === 'en' ? 'ar' : 'en';
+            await i18n.setLanguage(newLang);
+        });
+
+        function showMessage(msg, type) {
+            alertBox.style.display = 'block';
+            alertBox.className = `alert-${type}`;
+            alertBox.innerHTML = msg;
+        }
+
+        watermarkType.addEventListener('change', () => {
+            textSettings.style.display = watermarkType.value === 'text' ? 'block' : 'none';
+            imageSettings.style.display = watermarkType.value === 'image' ? 'block' : 'none';
+        });
+
+        watermarkOpacity.addEventListener('input', () => {
+            opacityValue.textContent = watermarkOpacity.value;
+        });
+
+        watermarkRotation.addEventListener('input', () => {
+            rotationValue.textContent = watermarkRotation.value;
+        });
+
+        document.getElementById('watermarkImage').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                watermarkImageFile = e.target.files[0];
+            }
+        });
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && (files[0].type === 'application/pdf' || files[0].name.toLowerCase().endsWith('.pdf'))) {
+                selectedFile = files[0];
+                dropzone.innerHTML = `<i class="fa-solid fa-file-pdf"></i><p>${selectedFile.name}</p>`;
+                watermarkBtn.disabled = false;
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                dropzone.innerHTML = `<i class="fa-solid fa-file-pdf"></i><p>${selectedFile.name}</p>`;
+                watermarkBtn.disabled = false;
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            selectedFile = null;
+            watermarkImageFile = null;
+            fileInput.value = '';
+            document.getElementById('watermarkImage').value = '';
+            dropzone.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><p data-i18n="upload.dragDrop">Drag and drop files here or click to browse</p>`;
+            watermarkBtn.disabled = true;
+            resetUI();
+        });
+
+        function resetUI() {
+            progressContainer.style.display = 'none';
+            resultContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+        }
+
+        watermarkBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            resetUI();
+            progressContainer.style.display = 'block';
+            watermarkBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('files', selectedFile);
+            formData.append('operation', 'watermark');
+            formData.append('watermark_type', watermarkType.value);
+            formData.append('watermark_text', document.getElementById('watermarkText').value);
+            formData.append('watermark_opacity', watermarkOpacity.value);
+            formData.append('watermark_position', document.getElementById('watermarkPosition').value);
+            formData.append('watermark_rotation', watermarkRotation.value);
+            formData.append('watermark_color', document.getElementById('watermarkColor').value);
+            
+            if (watermarkType.value === 'image' && watermarkImageFile) {
+                formData.append('watermark_image', watermarkImageFile);
+            }
+
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    currentJobId = data.job_id;
+                    pollJobStatus(currentJobId);
+                } else {
+                    showMessage(`❌ ${i18n.t('errors.serverError')}: ${data.detail || i18n.t('upload.failed')}`, 'error');
+                    watermarkBtn.disabled = false;
+                }
+            } catch (err) {
+                showMessage(`❌ ${i18n.t('errors.networkError')}`, 'error');
+                watermarkBtn.disabled = false;
+            }
+        });
+
+        async function pollJobStatus(jobId) {
+            const maxAttempts = 60;
+            let attempts = 0;
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                const progress = Math.min((attempts / maxAttempts) * 100, 90);
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${i18n.t('upload.processing')} (${attempts}/${maxAttempts})`;
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/v1/jobs/${jobId}`);
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        const job = data.job;
+                        if (job.status === 'PROCESSING') {
+                        } else if (job.status === 'COMPLETED') {
+                            clearInterval(pollInterval);
+                            progressFill.style.width = '100%';
+                            progressContainer.style.display = 'none';
+                            resultContainer.style.display = 'block';
+                            downloadBtn.href = `http://localhost:8080/api/v1/download/${job.output_file}`;
+                            watermarkBtn.disabled = false;
+                        } else if (job.status === 'FAILED') {
+                            clearInterval(pollInterval);
+                            showMessage(`❌ ${i18n.t('status.failed')}: ${job.error || i18n.t('errors.serverError')}`, 'error');
+                            progressContainer.style.display = 'none';
+                            watermarkBtn.disabled = false;
+                        }
+                    } else {
+                        clearInterval(pollInterval);
+                        showMessage(`❌ ${i18n.t('errors.serverError')}`, 'error');
+                        progressContainer.style.display = 'none';
+                        watermarkBtn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error('Polling error:', err);
+                }
+                if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    showMessage(`⏱️ ${i18n.t('errors.timeout')}`, 'error');
+                    progressContainer.style.display = 'none';
+                    watermarkBtn.disabled = false;
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

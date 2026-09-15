@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حول المنصة - PDFFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .clickable-card {
+            cursor: pointer !important;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .clickable-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="star-bg">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+    </div>
+
+    <!-- شريط التنقل مع روابط وظيفية -->
+    <header>
+        <a href="../index.html" class="brand">
+            <i class="fa-solid fa-file-pdf fa-xl"></i>
+            <h1>PDFFlow</h1>
+        </a>
+        <ul class="nav-links">
+            <li><a href="tools.html">جميع الأدوات</a></li>
+            <li><a href="security.html">الأمان والتشفير</a></li>
+            <li><a href="about.html" style="color: #fff; font-weight: bold;">حول المنصة</a></li>
+            <li><a href="../index.html" class="nav-btn">الرئيسية</a></li>
+        </ul>
+    </header>
+
+    <div class="hero">
+        <h2>عن منصة PDFFlow</h2>
+        <p>حلول سحابية متقدمة لتسهيل العمل مع مستندات PDF بسرعة وكفاءة عالية.</p>
+    </div>
+
+    <!-- البطاقات: أصبحت أزرار تفاعلية توجه للمنصة والأدوات -->
+    <div class="container">
+        <div class="tools-grid">
+            <div class="tool-card clickable-card" onclick="window.location.href='tools.html'">
+                <i class="fa-solid fa-bolt tool-icon"></i>
+                <h3 class="tool-title">أداء فائق السرعة</h3>
+                <p class="tool-desc">بنية تحتية مبنية بمعمارية Microservices حديثة تضمن معالجة سريعة حتى مع الملفات الكبيرة. (اضغط لتجربة الأدوات)</p>
+            </div>
+
+            <div class="tool-card clickable-card" onclick="window.location.href='tools.html'">
+                <i class="fa-solid fa-laptop-code tool-icon"></i>
+                <h3 class="tool-title">تقنيات حديثة</h3>
+                <p class="tool-desc">تعتمد المنصة على محركات متطورة لمعالجة النصوص بدقة متناهية دون تشويه للتنسيق. (تصفح التقنيات)</p>
+            </div>
+
+            <div class="tool-card clickable-card" onclick="window.location.href='../index.html'">
+                <i class="fa-solid fa-globe tool-icon"></i>
+                <h3 class="tool-title">متاحة في كل مكان</h3>
+                <p class="tool-desc">يمكنك الوصول إلى جميع الأدوات عبر أي متصفح وأي جهاز دون الحاجة لتثبيت برامج. (ابدأ الآن)</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-bottom" style="border: none; text-align: center; justify-content: center;">
+            <p>© 2026 PDFFlow. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+</body>
+</html>
