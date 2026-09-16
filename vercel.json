@@ -1,8 +1,11 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
-    }
+    { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/css/(.*)", "destination": "/frontend/css/$1" },
+    { "source": "/js/(.*)", "destination": "/frontend/js/$1" },
+    { "source": "/pages/(.*)", "destination": "/frontend/pages/$1" },
+    { "source": "/locales/(.*)", "destination": "/frontend/locales/$1" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
   ]
 }
