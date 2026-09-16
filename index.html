@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyPDF - منصة معالجة ملفات PDF السحابية</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="frontend/css/style.css">
+
+    <style>
+        /* =========================================================
+           ACTION BUTTON COMPONENT
+           ========================================================= */
+        .button {
+            display: inline-block;
+            border-radius: 7px;
+            border: none;
+            background: #1875FF;
+            color: white;
+            font-family: inherit;
+            text-align: center;
+            font-size: 13px;
+            box-shadow: 0px 14px 56px -11px #1875FF;
+            width: 10em;
+            padding: 1em;
+            transition: all 0.4s;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.4s;
+        }
+
+        .button span:after {
+            content: 'for free';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -20px;
+            transition: 0.7s;
+        }
+
+        .button:hover span {
+            padding-right: 3.55em;
+        }
+
+        .button:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        /* =========================================================
+           STATUS ALERT CONTAINER
+           ========================================================= */
+        #statusAlert {
+            width: min(700px, 90%);
+            margin: 25px auto;
+            text-align: center;
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.9;
+            transition: all 0.3s ease;
+            min-height: 0;
+            display: none;
+        }
+
+        .alert-info,
+        .alert-success,
+        .alert-error {
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid;
+            animation: statusAppear 0.3s ease;
+        }
+
+        .alert-info {
+            background: rgba(24, 117, 255, 0.12);
+            border-color: rgba(24, 117, 255, 0.75);
+            color: #ffffff;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 130, 0.12);
+            border-color: rgba(0, 220, 150, 0.8);
+            color: #ffffff;
+        }
+
+        .alert-error {
+            background: rgba(255, 40, 80, 0.12);
+            border-color: rgba(255, 60, 90, 0.8);
+            color: #ffffff;
+        }
+
+        /* =========================================================
+           PROCESSING PROGRESS BAR
+           ========================================================= */
+        .status-progress {
+            width: 100%;
+            height: 6px;
+            margin-top: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.10);
+            position: relative;
+        }
+
+        .status-progress-bar {
+            width: 35%;
+            height: 100%;
+            border-radius: 10px;
+            background: #1875FF;
+            animation: processingProgress 1.4s infinite ease-in-out;
+        }
+
+        /* =========================================================
+           DOWNLOAD BUTTON
+           ========================================================= */
+        .download-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 12px 28px;
+            border-radius: 8px;
+            background: #10b981;
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            background: #059669;
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5);
+        }
+
+        .selected-files {
+            margin-top: 8px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .job-id {
+            direction: ltr;
+            display: inline-block;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        @keyframes processingProgress {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(400%); }
+        }
+
+        @keyframes statusAppear {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="star-bg">
+        <div class="stars-layer"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <h1>MyPDF</h1>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="frontend/pages/tools.html">جميع الأدوات</a></li>
+            <li><a href="frontend/pages/security.html">الأمان والتشفير</a></li>
+            <li><a href="frontend/pages/about.html">حول المنصة</a></li>
+            <li><button id="langToggle" class="lang-btn" type="button">English</button></li>
+            <li><a href="#" class="nav-btn" id="openLoginBtn">تسجيل الدخول</a></li>
+        </ul>
+    </header>
+
+    <div class="hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-bolt"></i>
+            معالجة سحابية فائقة السرعة
+        </div>
+        <h2>كل أدوات PDF في منصة واحدة آمنة</h2>
+        <p>قم بدمج، تقسيم، ضغط، وتشفير مستنداتك بسرعة فائقة مع الحفاظ الكامل على خصوصية بياناتك وجودة ملفاتك.</p>
+    </div>
+
+    <div id="statusAlert" aria-live="polite"></div>
+
+    <input type="file" id="fileInput" accept="application/pdf,image/*" hidden />
+
+    <div class="container" id="tools">
+        <div class="tools-grid">
+
+            <div class="card" onclick="startProcess('merge')">
+                <div class="tool-icon-box"><i class="fa-solid fa-object-group"></i></div>
+                <p class="heading">دمج PDF</p>
+                <p>دمج عدة مستندات في ملف واحد متناسق مع ترتيبها بالسحب والإفلات.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('merge')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('split')">
+                <div class="tool-icon-box"><i class="fa-solid fa-scissors"></i></div>
+                <p class="heading">تقسيم PDF</p>
+                <p>استخراج نطاق صفحات محدد أو فصل الصفحات في ملفات مستقلة.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('split')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('compress')">
+                <div class="tool-icon-box"><i class="fa-solid fa-compress"></i></div>
+                <p class="heading">ضغط PDF</p>
+                <p>تقليل حجم المستند لأقصى حد ممكن مع الحفاظ على وضوح الخطوط وجودة الصور.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('compress')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('rotate')">
+                <div class="tool-icon-box"><i class="fa-solid fa-rotate-right"></i></div>
+                <p class="heading">تدوير PDF</p>
+                <p>تعديل اتجاه وزوايا الصفحات المقلوبة (90°، 180°، 270°) وحفظها مباشرة.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('rotate')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('organize')">
+                <div class="tool-icon-box"><i class="fa-solid fa-folder-tree"></i></div>
+                <p class="heading">تنظيم الصفحات</p>
+                <p>إعادة فرز، حذف، وتغيير تسلسل الصفحات داخل المستند بكل مرونة.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('organize')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('pdf-to-jpg')">
+                <div class="tool-icon-box"><i class="fa-solid fa-file-image"></i></div>
+                <p class="heading">PDF إلى JPG</p>
+                <p>استخراج كافة صفحات المستند وتحويلها إلى صور عالية الدقة بصيغة JPG.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('pdf-to-jpg')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('jpg-to-pdf')">
+                <div class="tool-icon-box"><i class="fa-solid fa-images"></i></div>
+                <p class="heading">JPG إلى PDF</p>
+                <p>تحويل مجموعة صور ودمجها وتضمينها داخل ملف PDF منظم وموحد.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('jpg-to-pdf')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('watermark')">
+                <div class="tool-icon-box"><i class="fa-solid fa-stamp"></i></div>
+                <p class="heading">علامة مائية</p>
+                <p>إضافة أختام ونصوص شفافة مع التحكم بالموضع لحماية حقوق الملكية والتوثيق.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('watermark')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('protect')">
+                <div class="tool-icon-box"><i class="fa-solid fa-lock"></i></div>
+                <p class="heading">حماية وتشفير</p>
+                <p>تأمين المستند بكلمة مرور مشفرة لمنع الفتح أو التعديل دون إذن.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('protect')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+            <div class="card" onclick="startProcess('unlock')">
+                <div class="tool-icon-box"><i class="fa-solid fa-lock-open"></i></div>
+                <p class="heading">فك الحماية</p>
+                <p>إزالة كلمات المرور والقيود من ملفاتك المصرح لك بفتحها واستخدامها.</p>
+                <button type="button" class="button" onclick="event.stopPropagation(); startProcess('unlock')">
+                    <span>ابدأ المعالجة</span>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="trust-bar">
+            <div class="trust-box">
+                <i class="fa-solid fa-shield-halved"></i>
+                <div>
+                    <h4>تشفير كامل TLS 1.3</h4>
+                    <p>اتصال محمي ومشفر بالكامل أثناء نقل ورفع الملفات</p>
+                </div>
+            </div>
+            <div class="trust-box">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <div>
+                    <h4>حذف تلقائي صارم</h4>
+                    <p>مسح كافة الملفات المرفوعة والناتجة نهائياً خلال ساعتين</p>
+                </div>
+            </div>
+            <div class="trust-box">
+                <i class="fa-solid fa-microchip"></i>
+                <div>
+                    <h4>بيئة معالجة معزولة</h4>
+                    <p>خوادم داخلية لا تطلع إطلاقاً على محتوى مستنداتك</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>MyPDF</h4>
+                <ul>
+                    <li><a href="index.html">الصفحة الرئيسية</a></li>
+                    <li><a href="frontend/pages/tools.html">كتالوج الأدوات</a></li>
+                    <li><a href="frontend/pages/about.html">حول المنصة</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>أدوات شائعة</h4>
+                <ul>
+                    <li><a href="#" onclick="startProcess('merge'); return false;">دمج المستندات</a></li>
+                    <li><a href="#" onclick="startProcess('compress'); return false;">ضغط الملفات</a></li>
+                    <li><a href="#" onclick="startProcess('pdf-to-jpg'); return false;">تحويل إلى صور</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>السياسات والشروط</h4>
+                <ul>
+                    <li><a href="frontend/pages/privacy.html">سياسة الخصوصية</a></li>
+                    <li><a href="frontend/pages/terms.html">شروط الاستخدام</a></li>
+                    <li><a href="frontend/pages/security.html">الأمان وحماية البيانات</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 MyPDF. جميع الحقوق محفوظة.</p>
+            <p>منصة معالجة ملفات PDF السحابية</p>
+        </div>
+    </footer>
+
+    <div id="loginModal">
+        <div class="modal-box">
+            <h3>تسجيل الدخول</h3>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور">
+            <button onclick="handleLoginSubmit()" class="btn-submit" type="button">دخول</button>
+            <button onclick="closeLogin()" class="btn-cancel" type="button">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://mypdf-api.onrender.com/api/v1';
+        const POLLING_INTERVAL = 2000;
+        const MAX_POLLING_TIME = 5 * 60 * 1000;
+
+        let currentOperation = 'compress';
+        let currentJobId = null;
+        let pollingTimer = null;
+        let pollingStartedAt = null;
+
+        const fileInput = document.getElementById('fileInput');
+        const alertBox = document.getElementById('statusAlert');
+        const loginModal = document.getElementById('loginModal');
+        const openLoginBtn = document.getElementById('openLoginBtn');
+        const langToggle = document.getElementById('langToggle');
+
+        if (langToggle) {
+            langToggle.addEventListener('click', function () {
+                const current = langToggle.textContent.trim();
+                langToggle.textContent = current === 'English' ? 'العربية' : 'English';
+            });
+        }
+
+        function showStatus(message, type = 'info', progress = false) {
+            if (!alertBox) return;
+            alertBox.style.display = 'block';
+            alertBox.className = `alert-${type}`;
+            alertBox.innerHTML = message;
+
+            if (progress) {
+                alertBox.innerHTML += `
+                    <div class="status-progress">
+                        <div class="status-progress-bar"></div>
+                    </div>
+                `;
+            }
+        }
+
+        function showInfo(message, progress = false) { showStatus(message, 'info', progress); }
+        function showSuccess(message) { showStatus(message, 'success', false); }
+        function showError(message) { showStatus(message, 'error', false); }
+
+        function startProcess(operation) {
+            currentOperation = operation;
+            currentJobId = null;
+            stopPolling();
+
+            fileInput.multiple = (operation === 'merge' || operation === 'jpg-to-pdf');
+            if (operation === 'jpg-to-pdf') {
+                fileInput.accept = 'image/jpeg,image/png,image/jpg';
+            } else {
+                fileInput.accept = 'application/pdf';
+            }
+
+            fileInput.value = '';
+            fileInput.click();
+        }
+
+        fileInput.addEventListener('change', async function (event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            if (!validateFiles(files)) {
+                fileInput.value = '';
+                return;
+            }
+
+            await sleep(200);
+            await uploadFiles(files);
+        });
+
+        function validateFiles(files) {
+            if (!files.length) {
+                showError('المرجو اختيار ملف.');
+                return false;
+            }
+
+            if (currentOperation === 'merge' && files.length < 2) {
+                showError('عملية دمج PDF تحتاج إلى ملفين PDF على الأقل.');
+                return false;
+            }
+
+            for (const file of files) {
+                const name = file.name.toLowerCase();
+                if (currentOperation === 'jpg-to-pdf') {
+                    if (!name.endsWith('.jpg') && !name.endsWith('.jpeg') && !name.endsWith('.png')) {
+                        showError(`الملف <b>${escapeHtml(file.name)}</b> ليس صورة صالحة (JPG/PNG).`);
+                        return false;
+                    }
+                } else {
+                    if (!name.endsWith('.pdf')) {
+                        showError(`الملف <b>${escapeHtml(file.name)}</b> ليس ملف PDF.`);
+                        return false;
+                    }
+                }
+
+                if (file.size <= 0) {
+                    showError(`الملف <b>${escapeHtml(file.name)}</b> فارغ.`);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function uploadFiles(files) {
+            try {
+                showInfo(`
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    جاري رفع <b>${files.length}</b> ملف إلى السيرفر...
+                    <br>
+                    <small>العملية: <b>${escapeHtml(currentOperation)}</b></small>
+                `, true);
+
+                const formData = new FormData();
+                for (const file of files) {
+                    formData.append('files', file, file.name);
+                }
+                formData.append('operation', currentOperation);
+
+                const response = await fetch(`${API_BASE_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                let data = null;
+                try {
+                    data = await response.json();
+                } catch (jsonError) {
+                    console.error('Invalid JSON:', jsonError);
+                }
+
+                if (!response.ok) {
+                    throw new Error(data?.detail || data?.message || `فشل الرفع. HTTP ${response.status}`);
+                }
+
+                const jobId = data?.job_id || data?.data?.job_id;
+                if (!jobId) {
+                    throw new Error('تم رفع الملف ولكن الخادم لم يرجع رقم المهمة.');
+                }
+
+                currentJobId = jobId;
+
+                showInfo(`
+                    <i class="fa-solid fa-gears"></i>
+                    <b>تم استلام الملف بنجاح!</b>
+                    <br>
+                    جاري المعالجة بواسطة الـ Worker...
+                    <br>
+                    <small>رقم المهمة: <span class="job-id">${escapeHtml(jobId)}</span></small>
+                `, true);
+
+                await pollJobStatus(jobId);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError(`
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <b>فشل رفع الملف.</b>
+                    <br>
+                    ${escapeHtml(error.message || 'تعذر الاتصال بالخادم. إذا كان السيرفر في وضع الخمول فقد يستغرق دقيقة للاستيقاظ.')}
+                `);
+            } finally {
+                fileInput.value = '';
+            }
+        }
+
+        async function pollJobStatus(jobId) {
+            stopPolling();
+            pollingStartedAt = Date.now();
+
+            async function checkJob() {
+                try {
+                    const elapsed = Date.now() - pollingStartedAt;
+                    if (elapsed >= MAX_POLLING_TIME) {
+                        stopPolling();
+                        showError(`انتهت مهلة الانتظار. تأكد من تشغيل الخادم.`);
+                        return;
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}/jobs/${encodeURIComponent(jobId)}`, {
+                        method: 'GET',
+                        cache: 'no-store'
+                    });
+
+                    let data = null;
+                    try {
+                        data = await response.json();
+                    } catch {
+                        data = null;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(data?.detail || `HTTP ${response.status}`);
+                    }
+
+                    const job = data?.job || data?.data?.job || data;
+                    const status = String(job?.status || data?.status || '').toUpperCase();
+
+                    if (status === 'PENDING') {
+                        showInfo(`
+                            <i class="fa-solid fa-clock"></i>
+                            <b>الملف قيد الانتظار في قائمة المهام...</b>
+                            <br>
+                            <small>Job: <span class="job-id">${escapeHtml(jobId)}</span></small>
+                        `, true);
+                        scheduleNextCheck(checkJob);
+                        return;
+                    }
+
+                    if (status === 'PROCESSING') {
+                        showInfo(`
+                            <i class="fa-solid fa-gears"></i>
+                            <b>جاري معالجة الملف الآن...</b>
+                            <br>
+                            <small>المرجو الانتظار لحظات...</small>
+                        `, true);
+                        scheduleNextCheck(checkJob);
+                        return;
+                    }
+
+                    if (status === 'COMPLETED') {
+                        stopPolling();
+                        const outputFile = job.output_file || `${jobId}_output.pdf`;
+                        const downloadUrl = `${API_BASE_URL}/download/${encodeURIComponent(outputFile)}`;
+
+                        showSuccess(`
+                            <i class="fa-solid fa-circle-check"></i>
+                            <b>تمت معالجة الملف بنجاح!</b>
+                            <br>
+                            ملفك جاهز للتحميل الآن:
+                            <br>
+                            <a href="${escapeHtml(downloadUrl)}" class="download-btn" download>
+                                <i class="fa-solid fa-download"></i>
+                                تحميل الملف الجاهز
+                            </a>
+                        `);
+                        return;
+                    }
+
+                    if (status === 'FAILED') {
+                        stopPolling();
+                        const errorMessage = job?.error || 'حدث خطأ أثناء معالجة الملف.';
+                        showError(`
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            <b>فشلت المعالجة:</b>
+                            <br>
+                            ${escapeHtml(errorMessage)}
+                        `);
+                        return;
+                    }
+
+                    scheduleNextCheck(checkJob);
+
+                } catch (error) {
+                    console.error('Polling error:', error);
+                    scheduleNextCheck(checkJob);
+                }
+            }
+
+            await checkJob();
+        }
+
+        function scheduleNextCheck(callback) {
+            if (pollingTimer !== null) clearTimeout(pollingTimer);
+            pollingTimer = setTimeout(callback, POLLING_INTERVAL);
+        }
+
+        function stopPolling() {
+            if (pollingTimer !== null) {
+                clearTimeout(pollingTimer);
+                pollingTimer = null;
+            }
+            pollingStartedAt = null;
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        if (openLoginBtn) {
+            openLoginBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                loginModal.style.display = 'flex';
+            });
+        }
+
+        function closeLogin() {
+            loginModal.style.display = 'none';
+        }
+
+        function handleLoginSubmit() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) {
+                alert('يرجى إدخال البريد الإلكتروني');
+                return;
+            }
+            alert('تم تسجيل البيانات.');
+            closeLogin();
+        }
+
+        if (loginModal) {
+            loginModal.addEventListener('click', function (e) {
+                if (e.target === loginModal) closeLogin();
+            });
+        }
+
+        window.addEventListener('beforeunload', stopPolling);
+    </script>
+</body>
+</html>
