@@ -376,9 +376,9 @@
     </div>
 
     <script>
-        // تم تغيير المنفذ إلى 8000 ليتطابق مع تشغيل VS Code
-        const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
-        const POLLING_INTERVAL = 1500;
+        // الرابط السحابي المباشر لخادم Render
+        const API_BASE_URL = 'https://mypdf-api.onrender.com/api/v1';
+        const POLLING_INTERVAL = 2000;
         const MAX_POLLING_TIME = 5 * 60 * 1000;
 
         let currentOperation = 'compress';
@@ -484,7 +484,7 @@
             try {
                 showInfo(`
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    جاري رفع <b>${files.length}</b> ملف...
+                    جاري رفع <b>${files.length}</b> ملف إلى السيرفر...
                     <br>
                     <small>العملية: <b>${escapeHtml(currentOperation)}</b></small>
                 `, true);
@@ -535,7 +535,7 @@
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <b>فشل رفع الملف.</b>
                     <br>
-                    ${escapeHtml(error.message || 'تعذر الاتصال بالخادم.')}
+                    ${escapeHtml(error.message || 'تعذر الاتصال بالخادم. إذا كان السيرفر في وضع الخمول فقد يستغرق دقيقة للاستيقاظ.')}
                 `);
             } finally {
                 fileInput.value = '';
@@ -551,7 +551,7 @@
                     const elapsed = Date.now() - pollingStartedAt;
                     if (elapsed >= MAX_POLLING_TIME) {
                         stopPolling();
-                        showError(`انتهت مهلة الانتظار. تأكد من تشغيل الـ Worker.`);
+                        showError(`انتهت مهلة الانتظار. تأكد من تشغيل الخادم.`);
                         return;
                     }
 
@@ -588,7 +588,7 @@
                     if (status === 'PROCESSING') {
                         showInfo(`
                             <i class="fa-solid fa-gears"></i>
-                            <b>جاري معالجة الملف الآن بواسطة الـ Worker...</b>
+                            <b>جاري معالجة الملف الآن...</b>
                             <br>
                             <small>المرجو الانتظار لحظات...</small>
                         `, true);
@@ -693,16 +693,8 @@
 
         window.addEventListener('beforeunload', stopPolling);
     </script>
-    <!-- استدعاء ملفات الاتصال بالباك إند -->
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    // فحص الاتصال بالخادم عند فتح الصفحة
-    ApiService.checkHealth().then(data => {
-      if (data) {
-        console.log('✅ متصل بسيرفر Render بنجاح:', data);
-      }
-    });
+</body>
+</html>
   </script>
 </body>
 </html>
