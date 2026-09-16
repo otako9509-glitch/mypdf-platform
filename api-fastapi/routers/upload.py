@@ -1,137 +1,131 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
-from typing import List, Optional
-import sys
 import os
-import asyncio
+import uuid
+from typing import List
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from services import job_service, storage_service, queue_service, JobStatus
-from database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from config import settings
+from services.job_service import job_service, JobStatus
+from processors.merge import merge_pdfs
+from processors.compress import compress_pdf
+from processors.rotate import rotate_pdf
+from processors.split import split_all_pages
+from processors.jpg_to_pdf import jpg_to_pdf
+from processors.protect import protect_pdf, unlock_pdf
 
 router = APIRouter()
 
+def execute_pdf_job(job_id: str, operation: str, input_paths: List[str], extra_params: dict = None):
+    """
+    تنفيذ المعالجة في الخلفية فوراً دون الحاجة إلى خادم Redis أو Worker منفصل
+    """
+    extra_params = extra_params or {}
+    job_service.update_job_status(job_id, JobStatus.PROCESSING)
+    
+    output_filename = f"{job_id}_output.pdf"
+    output_path = os.path.join(settings.OUTPUTS_PATH, output_filename)
+
+    try:
+        if operation == "merge":
+            if len(input_paths) < 2:
+                raise ValueError("دمج PDF يحتاج لملفين على الأقل")
+            merge_pdfs(input_paths, output_path)
+
+        elif operation == "compress":
+            compress_pdf(input_paths[0], output_path, quality="medium")
+
+        elif operation == "rotate":
+            rotation = int(extra_params.get("rotation", 90))
+            rotate_pdf(input_paths[0], output_path, rotation=rotation)
+
+        elif operation == "split":
+            split_dir = os.path.join(settings.OUTPUTS_PATH, f"{job_id}_split")
+            split_files = split_all_pages(input_paths[0], split_dir)
+            if split_files:
+                output_path = split_files[0]
+                output_filename = os.path.basename(output_path)
+            else:
+                raise ValueError("فشلت عملية التقسيم")
+
+        elif operation in ["jpg-to-pdf", "jpg_to_pdf"]:
+            jpg_to_pdf(input_paths, output_path)
+
+        elif operation == "protect":
+            password = extra_params.get("password", "123456")
+            protect_pdf(input_paths[0], output_path, password=password)
+
+        elif operation == "unlock":
+            password = extra_params.get("password", "")
+            unlock_pdf(input_paths[0], output_path, password=password)
+
+        else:
+            raise ValueError(f"العملية غير مدعومة: {operation}")
+
+        # تحديث الحالة إلى COMPLETED مع تسجيل اسم ملف التحميل
+        job_service.update_job_status(
+            job_id=job_id,
+            status=JobStatus.COMPLETED,
+            output_file=output_filename
+        )
+
+    except Exception as e:
+        job_service.update_job_status(
+            job_id=job_id,
+            status=JobStatus.FAILED,
+            error=str(e)
+        )
 
 @router.post("/upload")
 async def upload_file(
+    background_tasks: BackgroundTasks,
     operation: str = Form(...),
-    files: Optional[List[UploadFile]] = File(None),
-    file: Optional[UploadFile] = File(None),
-    compression_level: Optional[str] = Form(None),
-    rotation_angle: Optional[str] = Form(None),
-    split_mode: Optional[str] = Form(None),
-    page_range: Optional[str] = Form(None),
-    single_page: Optional[str] = Form(None),
-    page_order: Optional[str] = Form(None),
-    image_quality: Optional[str] = Form(None),
-    image_dpi: Optional[str] = Form(None),
-    page_orientation: Optional[str] = Form(None),
-    page_margin: Optional[str] = Form(None),
-    watermark_type: Optional[str] = Form(None),
-    watermark_text: Optional[str] = Form(None),
-    watermark_opacity: Optional[str] = Form(None),
-    watermark_position: Optional[str] = Form(None),
-    watermark_rotation: Optional[str] = Form(None),
-    watermark_color: Optional[str] = Form(None),
-    password: Optional[str] = Form(None),
-    encryption_level: Optional[str] = Form(None),
-    allow_print: Optional[bool] = Form(None),
-    allow_copy: Optional[bool] = Form(None),
-    allow_modify: Optional[bool] = Form(None),
-    db: AsyncSession = Depends(get_db)
+    files: List[UploadFile] = File(...),
+    password: str = Form(None),
+    rotation: int = Form(90)
 ):
-    # دمج الملفات القادمة سواء سميت file أو files
-    uploaded_files: List[UploadFile] = []
-    if files:
-        uploaded_files.extend(files)
-    if file:
-        uploaded_files.append(file)
+    if not files:
+        raise HTTPException(status_code=400, detail="المرجو اختيار ملف")
 
-    if not uploaded_files:
-        raise HTTPException(status_code=400, detail="لم يتم اختيار أي ملف للرفع.")
+    # التأكد من وجود مجلدات التخزين
+    os.makedirs(settings.UPLOADS_PATH, exist_ok=True)
+    os.makedirs(settings.OUTPUTS_PATH, exist_ok=True)
+    os.makedirs(settings.JOBS_PATH, exist_ok=True)
 
-    # توحيد صيغة اسم العملية
-    norm_operation = operation.replace("-", "_").lower()
+    job_id = str(uuid.uuid4())
+    saved_paths = []
+    input_metadata = []
 
-    # التحقق من نوع الملفات
-    for uf in uploaded_files:
-        filename_lower = (uf.filename or "").lower()
-        is_pdf = filename_lower.endswith(".pdf")
-        is_img = filename_lower.endswith((".jpg", ".jpeg", ".png"))
+    # حفظ الملفات المرفوعة مؤقتاً
+    for file in files:
+        ext = os.path.splitext(file.filename)[1].lower()
+        unique_name = f"{job_id}_{uuid.uuid4().hex[:8]}{ext}"
+        destination = os.path.join(settings.UPLOADS_PATH, unique_name)
 
-        if not (is_pdf or is_img):
-            raise HTTPException(status_code=400, detail=f"الملف '{uf.filename}' غير مدعوم.")
+        content = await file.read()
+        with open(destination, "wb") as buffer:
+            buffer.write(content)
 
-        # التحقق من ترويسة ملفات الـ PDF
-        if is_pdf:
-            file_content = await uf.read()
-            if not storage_service.validate_pdf_magic_bytes(file_content):
-                raise HTTPException(status_code=400, detail=f"الملف '{uf.filename}' ليس ملف PDF صالحاً.")
-            await uf.seek(0)
+        saved_paths.append(destination)
+        input_metadata.append({
+            "original_name": file.filename,
+            "stored_name": unique_name
+        })
 
-    # إنشاء المهمة
-    job = job_service.create_job(operation=norm_operation, input_files=[])
+    # تسجيل المهمة بحالة PENDING
+    job = job_service.create_job(operation=operation, input_files=input_metadata)
+    job.job_id = job_id
+    job_service._save_job(job)
 
-    input_files_metadata = []
-    # حفظ الملفات محلياً في مجلد التخزين
-    for uf in uploaded_files:
-        try:
-            file_metadata = storage_service.save_upload_file(uf, job.job_id)
-            input_files_metadata.append({
-                "original_name": file_metadata["original_name"],
-                "stored_name": file_metadata["stored_name"],
-                "size": file_metadata["size"]
-            })
-        except Exception as e:
-            job_service.delete_job(job.job_id)
-            raise HTTPException(status_code=500, detail=f"تعذر حفظ الملف: {str(e)}")
-
-    # تحديث المهمة بقائمة الملفات
-    job_service.update_job_input_files(job.job_id, input_files_metadata)
-
-    # تجهيز كائن المهمة للـ Worker
-    job_data = {
-        "job_id": job.job_id,
-        "operation": norm_operation,
-        "input_files": input_files_metadata,
-        "compression_level": compression_level,
-        "rotation_angle": rotation_angle,
-        "split_mode": split_mode,
-        "page_range": page_range,
-        "single_page": single_page,
-        "page_order": page_order,
-        "image_quality": image_quality,
-        "image_dpi": image_dpi,
-        "page_orientation": page_orientation,
-        "page_margin": page_margin,
-        "watermark_type": watermark_type,
-        "watermark_text": watermark_text,
-        "watermark_opacity": watermark_opacity,
-        "watermark_position": watermark_position,
-        "watermark_rotation": watermark_rotation,
-        "watermark_color": watermark_color,
+    extra_params = {
         "password": password,
-        "encryption_level": encryption_level,
-        "allow_print": allow_print,
-        "allow_copy": allow_copy,
-        "allow_modify": allow_modify
+        "rotation": rotation
     }
 
-    # محاولة إرسال المهمة إلى Redis مع تحديد timeout بثانية واحدة لتفادي تجمّد السيرفر
-    try:
-        await asyncio.wait_for(queue_service.enqueue_job(job_data), timeout=1.0)
-    except asyncio.TimeoutError:
-        print("[Queue Warning] Redis connection timed out. Skipping queue, worker will read from disk.")
-    except Exception as e:
-        print(f"[Queue Warning] Redis queue error: {e}")
+    # إضافة المعالجة إلى قائمة مهام الخلفية الفورية
+    background_tasks.add_task(execute_pdf_job, job_id, operation, saved_paths, extra_params)
 
-    # إرجاع الرد الفوري للواجهة
     return {
         "success": True,
-        "job_id": job.job_id,
-        "data": {"job_id": job.job_id},
-        "status": job.status.value,
-        "operation": job.operation,
-        "files": input_files_metadata
+        "job_id": job_id,
+        "status": "PENDING",
+        "operation": operation
     }
