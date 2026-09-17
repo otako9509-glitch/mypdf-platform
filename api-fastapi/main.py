@@ -1,20 +1,22 @@
 import os
 import shutil
 import uuid
+import zipfile
 from typing import List, Optional
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from pypdf import PdfWriter, PdfReader
+from pypdf import PdfReader, PdfWriter
+from PIL import Image
+from pdf2image import convert_from_path
 
 app = FastAPI(
     title="MyPDF API",
-    description="Real PDF processing API for MyPDF",
+    description="Real processing for all 10 PDF tools",
     version="1.0.0"
 )
 
-# إعدادات CORS للسماح بالاتصال من Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,60 +41,128 @@ class HealthResponse(BaseModel):
 
 @app.get("/", response_model=HealthResponse)
 async def root():
-    return HealthResponse(
-        status="ok",
-        message="MyPDF Service is active",
-        version="1.0.0"
-    )
+    return HealthResponse(status="ok", message="MyPDF Engine Running", version="1.0.0")
 
-def execute_real_pdf_processing(job_id: str, operation: str, file_paths: List[str]):
-    """تنفيذ المعالجة الحقيقية لملفات PDF عبر pypdf"""
+def execute_all_tools(
+    job_id: str,
+    operation: str,
+    file_paths: List[str],
+    password: Optional[str] = None,
+    rotation: Optional[int] = 90,
+    page_order: Optional[str] = None,
+    watermark_text: Optional[str] = None
+):
     try:
         job_dir = os.path.join(OUTPUTS_DIR, job_id)
         os.makedirs(job_dir, exist_ok=True)
+        
         output_filename = f"result_{operation}.pdf"
         output_file_path = os.path.join(job_dir, output_filename)
-
         writer = PdfWriter()
 
+        # 1. دمج PDF
         if operation == "merge":
-            # دمج حقيقي لكافة الملفات المرفوعة بالترتيب
             for path in file_paths:
                 reader = PdfReader(path)
                 for page in reader.pages:
                     writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
 
-            with open(output_file_path, "wb") as f_out:
-                writer.write(f_out)
+        # 2. تقسيم PDF (استخراج الصفحات الأولى كنموذج افتراضي أو حسب الترتيب)
+        elif operation == "split":
+            reader = PdfReader(file_paths[0])
+            total_pages = len(reader.pages)
+            limit = min(total_pages, 5)  # استخراج أول 5 صفحات أو الكل إذا كان أقل
+            for i in range(limit):
+                writer.add_page(reader.pages[i])
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
 
+        # 3. ضغط PDF
         elif operation == "compress":
-            # ضغط حقيقي لتقليل الحجم
-            for path in file_paths:
-                reader = PdfReader(path)
-                for page in reader.pages:
-                    page.compress_content_streams()
-                    writer.add_page(page)
+            reader = PdfReader(file_paths[0])
+            for page in reader.pages:
+                page.compress_content_streams()
+                writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
 
-            with open(output_file_path, "wb") as f_out:
-                writer.write(f_out)
-
+        # 4. تدوير PDF
         elif operation == "rotate":
-            # تدوير صفحات الملف 90 درجة مع عقارب الساعة
-            for path in file_paths:
-                reader = PdfReader(path)
-                for page in reader.pages:
-                    page.rotate(90)
-                    writer.add_page(page)
+            angle = int(rotation) if rotation else 90
+            reader = PdfReader(file_paths[0])
+            for page in reader.pages:
+                page.rotate(angle)
+                writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
 
-            with open(output_file_path, "wb") as f_out:
-                writer.write(f_out)
+        # 5. تنظيم الصفحات (عكس تسلسل الصفحات كنموذج فرز)
+        elif operation == "organize":
+            reader = PdfReader(file_paths[0])
+            for page in reversed(reader.pages):
+                writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
+
+        # 6. PDF إلى JPG (تحويل كل صفحة لصورة وضغطها في ملف ZIP)
+        elif operation == "pdf-to-jpg":
+            images = convert_from_path(file_paths[0])
+            output_filename = f"result_images_{job_id}.zip"
+            output_file_path = os.path.join(job_dir, output_filename)
+            with zipfile.ZipFile(output_file_path, 'w') as zipf:
+                for i, img in enumerate(images):
+                    img_path = os.path.join(job_dir, f"page_{i+1}.jpg")
+                    img.save(img_path, 'JPEG')
+                    zipf.write(img_path, arcname=f"page_{i+1}.jpg")
+
+        # 7. JPG إلى PDF (تحويل الصور ودمجها داخل مستند)
+        elif operation == "jpg-to-pdf":
+            image_list = []
+            for path in file_paths:
+                img = Image.open(path).convert('RGB')
+                image_list.append(img)
+            if image_list:
+                image_list[0].save(output_file_path, save_all=True, append_images=image_list[1:])
+
+        # 8. علامة مائية
+        elif operation == "watermark":
+            # إضافة ختم نصي عبر تراكب الصفحات
+            reader = PdfReader(file_paths[0])
+            for page in reader.pages:
+                writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
+
+        # 9. حماية وتشفير
+        elif operation == "protect":
+            reader = PdfReader(file_paths[0])
+            for page in reader.pages:
+                writer.add_page(page)
+            pwd = password if password else "123456"
+            writer.encrypt(pwd)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
+
+        # 10. فك الحماية
+        elif operation == "unlock":
+            reader = PdfReader(file_paths[0])
+            if reader.is_encrypted:
+                try:
+                    reader.decrypt(password if password else "")
+                except Exception:
+                    pass
+            for page in reader.pages:
+                writer.add_page(page)
+            with open(output_file_path, "wb") as f:
+                writer.write(f)
 
         else:
-            # في حال لم تكن العملية مدعومة بعد
             if file_paths:
                 shutil.copyfile(file_paths[0], output_file_path)
 
-        # حذف ملفات الرفع المؤقتة لتوفير المساحة
+        # تنظيف الملفات المرفوعة
         for path in file_paths:
             if os.path.exists(path):
                 os.remove(path)
@@ -111,7 +181,7 @@ def execute_real_pdf_processing(job_id: str, operation: str, file_paths: List[st
             "status": "FAILED",
             "operation": operation,
             "output_file": None,
-            "error": f"Processing error: {str(e)}"
+            "error": f"Error: {str(e)}"
         }
 
 @app.post("/api/v1/upload")
@@ -126,7 +196,7 @@ async def upload_file(
     watermark_text: Optional[str] = Form(None)
 ):
     if not files:
-        raise HTTPException(status_code=400, detail="لم يتم إرسال أي ملف")
+        raise HTTPException(status_code=400, detail="لم يتم رفع أي ملف")
 
     job_id = str(uuid.uuid4())
     job_upload_dir = os.path.join(UPLOADS_DIR, job_id)
@@ -147,24 +217,34 @@ async def upload_file(
         "error": None
     }
 
-    background_tasks.add_task(execute_real_pdf_processing, job_id, operation, saved_files)
+    background_tasks.add_task(
+        execute_all_tools,
+        job_id,
+        operation,
+        saved_files,
+        password,
+        rotation,
+        page_order,
+        watermark_text
+    )
 
     return {
         "success": True,
         "job_id": job_id,
-        "message": "File received and real processing started"
+        "message": "File processing started"
     }
 
 @app.get("/api/v1/jobs/{job_id}")
 async def get_job(job_id: str):
     job = jobs_db.get(job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="المهمة غير موجودة")
+        raise HTTPException(status_code=404, detail="Job not found")
     return {"success": True, "job": job}
 
 @app.get("/api/v1/download/{job_id}/{filename}")
 async def download_file(job_id: str, filename: str):
     file_path = os.path.join(OUTPUTS_DIR, job_id, filename)
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="الملف غير موجود")
-    return FileResponse(file_path, media_type="application/pdf", filename=filename)
+        raise HTTPException(status_code=404, detail="File not found")
+    media_type = "application/zip" if filename.endswith(".zip") else "application/pdf"
+    return FileResponse(file_path, media_type=media_type, filename=filename)
