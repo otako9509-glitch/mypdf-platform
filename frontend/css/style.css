@@ -7,7 +7,7 @@
   --bg-gradient: linear-gradient(180deg, #ffffff 0%, #fff5f5 100%);
   --text-dark: #1e293b;
   --text-muted: #64748b;
-  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-bg: rgba(255, 255, 255, 0.9);
   --border-soft: rgba(225, 29, 72, 0.15);
 }
 
@@ -92,6 +92,9 @@ header {
   font-weight: 700;
   box-shadow: 0 4px 14px rgba(225, 29, 72, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
 }
 
 .nav-btn:hover {
@@ -145,7 +148,7 @@ header {
   line-height: 1.6;
 }
 
-/* شبكة البطاقات - متجاوبة ومناسبة للهواتف */
+/* شبكة البطاقات - متجاوبة مع كل الشاشات والهواتف */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -154,12 +157,11 @@ header {
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
   justify-items: center;
 }
 
-/* تصميم البطاقة بتأثير Blob الملون والتدرج الأبيض */
 .card {
   position: relative;
   width: 100%;
@@ -247,81 +249,109 @@ header {
   line-height: 1.35;
 }
 
-/* Loader الحلقات الدائرية المتداخلة */
-.loader-wrapper {
+/* شريط التنبيهات */
+#statusAlert {
+  display: none;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.alert-error {
+  background: rgba(225, 29, 72, 0.12);
+  color: #9f1239;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+/* لودر الشريحة الإلكترونية ومسارات الطاقة */
+.circuit-loader-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 24px;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-.pl {
-  width: 5.5em;
-  height: 5.5em;
+.circuit-loader {
+  width: 100%;
+  height: auto;
 }
 
-.pl circle {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
+.trace-bg {
+  stroke: #e2e8f0;
+  stroke-width: 2;
+  fill: none;
 }
 
-.pl__ring1 { animation: ring1_ 4s 0s ease-in-out infinite; stroke: #e11d48; }
-.pl__ring2 { animation: ring2_ 4s 0.04s ease-in-out infinite; stroke: #f43f5e; }
-.pl__ring3 { animation: ring3_ 4s 0.08s ease-in-out infinite; stroke: #fb7185; }
-.pl__ring4 { animation: ring4_ 4s 0.12s ease-in-out infinite; stroke: #fda4af; }
-.pl__ring5 { animation: ring5_ 4s 0.16s ease-in-out infinite; stroke: #fecdd3; }
-.pl__ring6 { animation: ring6_ 4s 0.2s ease-in-out infinite; stroke: #ffe4e6; }
-
-@keyframes ring1_ {
-  from { stroke-dashoffset: -376.23; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -94.24; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -376.23; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -94.24; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -376.23; transform: rotate(4.75turn); }
+.trace-flow {
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 40 400;
+  stroke-dashoffset: 438;
+  filter: drop-shadow(0 0 6px currentColor);
+  animation: flow 3s cubic-bezier(0.5, 0, 0.9, 1) infinite;
 }
 
-@keyframes ring2_ {
-  from { stroke-dashoffset: -329.2; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -82.46; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -329.2; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -82.46; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -329.2; transform: rotate(4.75turn); }
+.yellow { stroke: #ffea00; color: #ffea00; }
+.blue   { stroke: #00ccff; color: #00ccff; }
+.green  { stroke: #00ff15; color: #00ff15; }
+.purple { stroke: #9900ff; color: #9900ff; }
+.red    { stroke: #e11d48; color: #e11d48; }
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-@keyframes ring3_ {
-  from { stroke-dashoffset: -288.44; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -72.25; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -288.44; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -72.25; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -288.44; transform: rotate(4.75turn); }
+.chip-body {
+  rx: 14;
+  ry: 14;
+  fill: #1e293b;
+  stroke: #0f172a;
+  stroke-width: 2;
 }
 
-@keyframes ring4_ {
-  from { stroke-dashoffset: -253.96; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -63.61; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -253.96; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -63.61; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -253.96; transform: rotate(4.75turn); }
+.chip-text {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  fill: #ffffff;
+  letter-spacing: 1px;
 }
 
-@keyframes ring5_ {
-  from { stroke-dashoffset: -225.74; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -56.54; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -225.74; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -56.54; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -225.74; transform: rotate(4.75turn); }
+.chip-pin {
+  stroke: #94a3b8;
+  stroke-width: 2;
 }
 
-@keyframes ring6_ {
-  from { stroke-dashoffset: -203.79; transform: rotate(-0.25turn); }
-  23% { stroke-dashoffset: -51.05; transform: rotate(1turn); }
-  46%, 50% { stroke-dashoffset: -203.79; transform: rotate(2.25turn); }
-  73% { stroke-dashoffset: -51.05; transform: rotate(3.5turn); }
-  96%, to { stroke-dashoffset: -203.79; transform: rotate(4.75turn); }
+.circuit-status-text {
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-red);
 }
 
-/* نافذة تسجيل الدخول */
+/* نافذة تسجيل الدخول الزجاجية */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -350,7 +380,7 @@ header {
   position: absolute;
   inset: 4px;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-radius: 14px;
   display: flex;
