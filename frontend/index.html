@@ -10,11 +10,6 @@
 </head>
 <body>
 
-    <!-- خلفية النجوم المتحركة -->
-    <div class="star-bg">
-        <div class="stars-layer"></div>
-    </div>
-
     <!-- شريط التنقل العلوي -->
     <header>
         <a href="index.html" class="brand">
@@ -55,102 +50,102 @@
 
             <!-- 1. دمج PDF -->
             <div class="card" onclick="startProcess('merge', true)">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-object-group"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-object-group"></i></div>
+                    <p class="heading">دمج PDF</p>
+                    <p>دمج عدة مستندات في ملف واحد</p>
                 </div>
-                <p class="heading">دمج PDF</p>
-                <p>دمج عدة مستندات في ملف واحد متناسق.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 2. تقسيم PDF -->
             <div class="card" onclick="startProcess('split')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-scissors"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-scissors"></i></div>
+                    <p class="heading">تقسيم PDF</p>
+                    <p>استخراج نطاق صفحات محدد</p>
                 </div>
-                <p class="heading">تقسيم PDF</p>
-                <p>استخراج نطاق صفحات محدد أو فصل الصفحات.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 3. ضغط PDF -->
             <div class="card" onclick="startProcess('compress')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-compress"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-compress"></i></div>
+                    <p class="heading">ضغط PDF</p>
+                    <p>تقليل حجم المستند وحفظ الجودة</p>
                 </div>
-                <p class="heading">ضغط PDF</p>
-                <p>تقليل حجم المستند مع الحفاظ على وضوح المحتوى.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 4. تدوير PDF -->
             <div class="card" onclick="startProcess('rotate')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-rotate-right"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-rotate-right"></i></div>
+                    <p class="heading">تدوير PDF</p>
+                    <p>تعديل زوايا الصفحات المقلوبة</p>
                 </div>
-                <p class="heading">تدوير PDF</p>
-                <p>تعديل اتجاه وزوايا الصفحات المقلوبة وحفظها.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 5. تنظيم الصفحات -->
             <div class="card" onclick="startProcess('organize')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-folder-tree"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-folder-tree"></i></div>
+                    <p class="heading">تنظيم الصفحات</p>
+                    <p>إعادة فرز وتغيير تسلسل الصفحات</p>
                 </div>
-                <p class="heading">تنظيم الصفحات</p>
-                <p>إعادة فرز وتغيير تسلسل الصفحات داخل المستند.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 6. PDF إلى JPG -->
             <div class="card" onclick="startProcess('pdf-to-jpg')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-file-image"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-file-image"></i></div>
+                    <p class="heading">PDF إلى JPG</p>
+                    <p>تحويل الصفحات إلى صور عالية الدقة</p>
                 </div>
-                <p class="heading">PDF إلى JPG</p>
-                <p>استخراج صفحات المستند وتحويلها إلى صور JPG.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 7. JPG إلى PDF -->
             <div class="card" onclick="startProcess('jpg-to-pdf', true)">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-images"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-images"></i></div>
+                    <p class="heading">JPG إلى PDF</p>
+                    <p>تحويل الصور ودمجها داخل مستند</p>
                 </div>
-                <p class="heading">JPG إلى PDF</p>
-                <p>تحويل مجموعة صور ودمجها داخل ملف PDF موحد.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 8. علامة مائية -->
             <div class="card" onclick="startProcess('watermark')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-stamp"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-stamp"></i></div>
+                    <p class="heading">علامة مائية</p>
+                    <p>إضافة أختام لحماية حقوق الملكية</p>
                 </div>
-                <p class="heading">علامة مائية</p>
-                <p>إضافة أختام ونصوص شفافة لحماية حقوق الملكية.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 9. حماية وتشفير -->
             <div class="card" onclick="startProcess('protect')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-lock"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-lock"></i></div>
+                    <p class="heading">حماية وتشفير</p>
+                    <p>تأمين المستند بكلمة مرور</p>
                 </div>
-                <p class="heading">حماية وتشفير</p>
-                <p>تأمين المستند بكلمة مرور لمنع الفتح دون إذن.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
             <!-- 10. فك الحماية -->
             <div class="card" onclick="startProcess('unlock')">
-                <div class="tool-icon-box">
-                    <i class="fa-solid fa-lock-open"></i>
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-lock-open"></i></div>
+                    <p class="heading">فك الحماية</p>
+                    <p>إزالة كلمات المرور والقيود</p>
                 </div>
-                <p class="heading">فك الحماية</p>
-                <p>إزالة كلمات المرور والقيود من ملفاتك المصرح لك بها.</p>
-                <p>ابدأ المعالجة &larr;</p>
             </div>
 
         </div>
@@ -168,50 +163,57 @@
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <div>
                     <h4>حذف تلقائي صارم</h4>
-                    <p>مسح كافة الملفات المرفوعة والناتجة نهائياً خلال ساعتين</p>
+                    <p>مسح كافة المستندات تلقائياً خلال ساعتين</p>
                 </div>
             </div>
             <div class="trust-box">
                 <i class="fa-solid fa-microchip"></i>
                 <div>
-                    <h4>بيئة معالجة معزولة</h4>
-                    <p>خوادم داخلية لا تطلع إطلاقاً على محتوى مستنداتك</p>
+                    <h4>معالجة آمنة ومعزولة</h4>
+                    <p>خوادم سحابية لا تطلع إطلاقاً على محتوى ملفاتك</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل الدخول الزجاجية -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="login-card">
+            <div class="blob"></div>
+            <div class="login-bg">
+                <button class="close-modal" id="closeLoginBtn">&times;</button>
+                <div class="login-header">
+                    <i class="fa-solid fa-user-shield login-icon"></i>
+                    <h3>تسجيل الدخول</h3>
+                    <p>لوحة تحكم المشرف</p>
+                </div>
+                <form class="login-form" onsubmit="event.preventDefault();">
+                    <div class="input-group">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" placeholder="البريد الإلكتروني" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="كلمة المرور" required>
+                    </div>
+                    <button type="submit" class="submit-btn">دخول</button>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- التذييل المنظم -->
     <footer>
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4>MyPDF</h4>
-                <ul>
-                    <li><a href="index.html">الصفحة الرئيسية</a></li>
-                    <li><a href="pages/tools.html">كتالوج الأدوات</a></li>
-                    <li><a href="pages/about.html">حول المنصة</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>السياسات والشروط</h4>
-                <ul>
-                    <li><a href="pages/privacy.html">سياسة الخصوصية</a></li>
-                    <li><a href="pages/terms.html">شروط الاستخدام</a></li>
-                    <li><a href="pages/security.html">الأمان وحماية البيانات</a></li>
-                </ul>
-            </div>
-        </div>
         <div class="footer-bottom">
             <p>© 2026 MyPDF. جميع الحقوق محفوظة.</p>
-            <p>منصة معالجة ملفات PDF السحابية</p>
         </div>
     </footer>
 
-    <!-- سكريبت إدارة الرفع والتتبع المباشر -->
+    <!-- سكريبت إدارة الرفع والتتبع المباشر باللودر الجديد -->
     <script>
         const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
             ? 'http://127.0.0.1:8080/api/v1'
-            : 'https://mypdf-api.onrender.com/api/v1';
+            : 'https://mypdf-platform.onrender.com/api/v1';
 
         let currentOperation = 'merge';
         const fileInput = document.getElementById('fileInput');
@@ -219,7 +221,40 @@
         const downloadContainer = document.getElementById('downloadContainer');
         const downloadLink = document.getElementById('downloadLink');
 
-        function showMessage(msg, type) {
+        function getCircuitLoaderHtml(statusText) {
+            return `
+                <div class="circuit-loader-container">
+                    <svg class="circuit-loader" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+                        <path class="trace-bg" d="M 20 90 L 90 90" />
+                        <path class="trace-bg" d="M 40 40 L 90 70" />
+                        <path class="trace-bg" d="M 40 140 L 90 110" />
+                        <path class="trace-bg" d="M 210 90 L 280 90" />
+                        <path class="trace-bg" d="M 210 70 L 260 40" />
+                        <path class="trace-bg" d="M 210 110 L 260 140" />
+
+                        <path class="trace-flow red" d="M 20 90 L 90 90" />
+                        <path class="trace-flow yellow" d="M 40 40 L 90 70" />
+                        <path class="trace-flow green" d="M 40 140 L 90 110" />
+                        <path class="trace-flow blue" d="M 210 90 L 280 90" />
+                        <path class="trace-flow purple" d="M 210 70 L 260 40" />
+                        <path class="trace-flow red" d="M 210 110 L 260 140" />
+
+                        <line class="chip-pin" x1="82" y1="70" x2="90" y2="70" />
+                        <line class="chip-pin" x1="82" y1="90" x2="90" y2="90" />
+                        <line class="chip-pin" x1="82" y1="110" x2="90" y2="110" />
+                        <line class="chip-pin" x1="210" y1="70" x2="218" y2="70" />
+                        <line class="chip-pin" x1="210" y1="90" x2="218" y2="90" />
+                        <line class="chip-pin" x1="210" y1="110" x2="218" y2="110" />
+
+                        <rect class="chip-body" x="90" y="50" width="120" height="80" />
+                        <text class="chip-text" x="150" y="96" text-anchor="middle">MyPDF</text>
+                    </svg>
+                    <div class="circuit-status-text">${statusText}</div>
+                </div>
+            `;
+        }
+
+        function showStatusMessage(msg, type) {
             alertBox.style.display = 'block';
             alertBox.className = `alert-${type}`;
             alertBox.innerHTML = msg;
@@ -236,7 +271,9 @@
             if (!e.target.files.length) return;
             const files = Array.from(e.target.files);
 
-            showMessage(`⏳ جاري رفع ${files.length} ملف لتنفيذ عملية: ${currentOperation}...`, 'info');
+            alertBox.style.display = 'block';
+            alertBox.className = '';
+            alertBox.innerHTML = getCircuitLoaderHtml(`جاري رفع ${files.length} ملف إلى السيرفر...`);
 
             const formData = new FormData();
             formData.append('operation', currentOperation);
@@ -250,13 +287,13 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showMessage(`🚀 تم استلام الملف بنجاح! جاري متابعة المعالجة (المهمة: <b>${data.job_id}</b>)...`, 'info');
+                    alertBox.innerHTML = getCircuitLoaderHtml(`جاري المعالجة السحابية للمهمة: <b>${data.job_id}</b>...`);
                     pollJobStatus(data.job_id);
                 } else {
-                    showMessage(`❌ خطأ: ${data.detail || 'فشل رفع الملف'}`, 'error');
+                    showStatusMessage(`❌ خطأ: ${data.detail || 'فشل رفع الملف'}`, 'error');
                 }
             } catch (err) {
-                showMessage('❌ تعذر الاتصال بالخادم. المرجو التحقق من تشغيل السيرفر أو الاتصال بالإنترنت.', 'error');
+                showStatusMessage('❌ تعذر الاتصال بالخادم. المرجو التحقق من تشغيل السيرفر أو الاتصال بالإنترنت.', 'error');
             } finally {
                 fileInput.value = '';
             }
@@ -276,17 +313,17 @@
                         const job = data.job;
 
                         if (job.status === 'PROCESSING') {
-                            showMessage(`⚙️ جاري معالجة المستندات في الخلفية... (${attempts}/${maxAttempts})`, 'info');
+                            alertBox.innerHTML = getCircuitLoaderHtml(`جاري معالجة المستندات في الخلفية... (${attempts}/${maxAttempts})`);
                         } else if (job.status === 'COMPLETED') {
                             clearInterval(interval);
-                            showMessage(`✅ اكتملت المعالجة بنجاح! يمكنك الآن تنزيل المستند الجاهز.`, 'success');
+                            showStatusMessage(`✅ اكتملت المعالجة بنجاح! يمكنك الآن تنزيل المستند الجاهز.`, 'success');
                             
                             const fileDownloadUrl = `${API_BASE_URL}/download/${encodeURIComponent(job.job_id)}/${encodeURIComponent(job.output_file)}`;
                             downloadLink.href = fileDownloadUrl;
                             downloadContainer.style.display = 'block';
                         } else if (job.status === 'FAILED') {
                             clearInterval(interval);
-                            showMessage(`❌ فشلت المعالجة: ${job.error || 'حدث خطأ غير متوقع'}`, 'error');
+                            showStatusMessage(`❌ فشلت المعالجة: ${job.error || 'حدث خطأ غير متوقع'}`, 'error');
                         }
                     }
                 } catch (err) {
@@ -295,10 +332,34 @@
 
                 if (attempts >= maxAttempts) {
                     clearInterval(interval);
-                    showMessage(`⌛ انتهت مهلة الانتظار. يرجى إعادة المحاولة لاحقاً.`, 'error');
+                    showStatusMessage(`⌛ انتهت مهلة الانتظار. يرجى إعادة المحاولة لاحقاً.`, 'error');
                 }
             }, 2000);
         }
+
+        // تحكم نافذة تسجيل الدخول
+        const loginModal = document.getElementById('loginModal');
+        const openLoginBtn = document.getElementById('openLoginBtn');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+
+        if (openLoginBtn && loginModal) {
+            openLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.style.display = 'flex';
+            });
+        }
+
+        if (closeLoginBtn && loginModal) {
+            closeLoginBtn.addEventListener('click', () => {
+                loginModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
