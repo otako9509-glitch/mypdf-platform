@@ -6,3 +6,4 @@ pydantic-settings
 redis
 sqlalchemy
 aiosqlite
+pypdf>=4.0.0
