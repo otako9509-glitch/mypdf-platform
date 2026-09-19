@@ -23,6 +23,7 @@ async def upload_file(
     page_order: Optional[str] = Form(None),
     compression_level: Optional[str] = Form("medium"),
     watermark_text: Optional[str] = Form(None),
+    edits_data: Optional[str] = Form(None),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -78,17 +79,19 @@ async def upload_file(
     # تسجيل المهمة رسمياً في قاعدة البيانات بحالة PENDING
     job = await job_service.create_job(db, job_id, norm_op, saved_metadata)
 
-    # تجهيز حمولة الـ Redis الموحدة
+    # تجهيز حمولة الـ Redis الموحدة متضمنة التعديلات
     job_payload = {
         "job_id": job_id,
         "operation": norm_op,
         "input_files": saved_metadata,
+        "edits_data": edits_data,
         "options": {
             "password": password,
             "rotation": rotation,
             "page_order": page_order,
             "compression_level": compression_level,
-            "watermark_text": watermark_text
+            "watermark_text": watermark_text,
+            "edits_data": edits_data
         },
         "created_at": datetime.now(timezone.utc).isoformat()
     }
