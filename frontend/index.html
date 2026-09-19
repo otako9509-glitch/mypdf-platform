@@ -138,7 +138,17 @@
                 </div>
             </div>
 
-            <!-- 10. فك الحماية -->
+            <!-- 10. تعديل الملف -->
+            <div class="card" onclick="openEditor()">
+                <div class="blob"></div>
+                <div class="bg">
+                    <div class="tool-icon-box"><i class="fa-solid fa-pen-to-square"></i></div>
+                    <p class="heading">تعديل الملف</p>
+                    <p>إضافة نصوص وصور، وتعديل ومسح المحتوى بسهولة</p>
+                </div>
+            </div>
+
+            <!-- 11. فك الحماية -->
             <div class="card" onclick="startProcess('unlock')">
                 <div class="blob"></div>
                 <div class="bg">
@@ -209,7 +219,7 @@
         </div>
     </footer>
 
-    <!-- كود الجافاسكريبت مع الرابط المباشر الصحيح -->
+    <!-- كود الجافاسكريبت -->
     <script>
         const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
             ? 'http://127.0.0.1:8080/api/v1'
@@ -220,6 +230,26 @@
         const alertBox = document.getElementById('statusAlert');
         const downloadContainer = document.getElementById('downloadContainer');
         const downloadLink = document.getElementById('downloadLink');
+
+        // دالة فتح محرر الـ PDF في صفحة مستقلة
+        function openEditor() {
+            const picker = document.createElement('input');
+            picker.type = 'file';
+            picker.accept = 'application/pdf';
+            picker.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    sessionStorage.setItem('pdf_to_edit', event.target.result);
+                    sessionStorage.setItem('pdf_name', file.name);
+                    window.open('pages/editor.html', '_blank');
+                };
+                reader.readAsDataURL(file);
+            };
+            picker.click();
+        }
 
         function getCircuitLoaderHtml(statusText) {
             return `
