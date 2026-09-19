@@ -3,530 +3,629 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تعديل ملف PDF - MyPDF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>مستند جديد - Word</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: #f4f5f8; color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', 'Cairo', Tahoma, sans-serif; }
+        body { background-color: #f3f2f1; color: #323130; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* شريط الأدوات العلوي */
-        .top-navbar {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+        /* 1. الشريط العلوي الأزرق الصغير لـ Word */
+        .word-header-top {
+            background-color: #1054a3;
+            color: #ffffff;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 24px;
-            height: 60px;
-            z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            padding: 0 16px;
         }
-        .nav-brand { font-size: 22px; font-weight: 800; color: #e5322d; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .main-tools-bar { display: flex; align-items: center; gap: 8px; }
-        .tool-action-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 8px 14px;
-            cursor: pointer;
-            color: #4a5568;
-            font-size: 16px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .tool-action-btn:hover { background: #f1f5f9; color: #000; }
-        .tool-action-btn.active { background: #fee2e2; color: #e5322d; border-color: #fca5a5; }
-
-        /* شريط تنسيق الخط */
-        .text-properties-bar {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 6px 24px;
+        .word-brand-title {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 13px;
-        }
-        .prop-select, .prop-input {
-            border: 1px solid #cbd5e1;
-            padding: 5px 10px;
-            border-radius: 6px;
-            outline: none;
-            background: #fff;
-            color: #334155;
-            font-size: 13px;
-        }
-        .prop-btn {
-            background: transparent;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .prop-btn.active { background: #e2e8f0; border-color: #94a3b8; }
-
-        /* مساحة العمل */
-        .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }
-        
-        .left-sidebar {
-            width: 280px;
-            background: #ffffff;
-            border-left: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px 16px;
-            z-index: 10;
-        }
-        .sidebar-title { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
-        .elements-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .element-row {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .element-row .del-btn { color: #94a3b8; cursor: pointer; }
-        .element-row .del-btn:hover { color: #ef4444; }
-
-        .btn-save-red {
-            background: #e5322d;
-            color: #fff;
-            border: none;
-            padding: 14px;
             font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-word-save {
+            background-color: #ffffff;
+            color: #1054a3;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 16px;
             font-weight: 700;
-            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 14px rgba(229, 50, 45, 0.3);
+            gap: 8px;
+            transition: background 0.2s;
         }
-        .btn-save-red:hover { background: #cc2420; }
+        .btn-word-save:hover { background-color: #edebe9; }
 
-        .pdf-viewer-area {
+        /* 2. تبويبات Word (Home, Insert, Layout...) */
+        .word-ribbon-tabs {
+            background-color: #ffffff;
+            border-bottom: 1px solid #edebe9;
+            display: flex;
+            padding: 0 20px;
+            height: 38px;
+            align-items: center;
+            gap: 20px;
+            direction: ltr; /* لتطابق واجهة Word تماماً */
+        }
+        .ribbon-tab {
+            font-size: 14px;
+            color: #323130;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 8px 4px;
+            position: relative;
+        }
+        .ribbon-tab.active {
+            font-weight: 600;
+            color: #1054a3;
+        }
+        .ribbon-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2.5px;
+            background-color: #1054a3;
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* 3. شريط أدوات Word المماثل للصورة الأولى بدقة */
+        .word-toolbar-strip {
+            background-color: #ffffff;
+            border-bottom: 1px solid #edebe9;
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            direction: ltr;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0 4px;
+            border-right: 1px solid #e1dfdd;
+        }
+        .toolbar-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            padding: 4px 6px;
+            cursor: pointer;
+            color: #323130;
+            font-size: 14px;
+            min-width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toolbar-btn:hover { background-color: #f3f2f1; }
+        .toolbar-btn.active { background-color: #edebe9; border-color: #c8c6c4; }
+
+        .toolbar-select {
+            border: 1px solid #c8c6c4;
+            border-radius: 3px;
+            padding: 3px 6px;
+            font-size: 13px;
+            background: #fff;
+            outline: none;
+            height: 28px;
+        }
+
+        /* 4. مسطرة Word القياسية */
+        .word-ruler-bar {
+            background: #fdfdfd;
+            border-bottom: 1px solid #e1dfdd;
+            height: 20px;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 40px;
+            position: relative;
+            direction: ltr;
+            font-size: 9px;
+            color: #605e5c;
+            user-select: none;
+        }
+        .ruler-tick {
+            position: absolute;
+            bottom: 0;
+            height: 5px;
+            border-left: 1px solid #8a8886;
+        }
+        .ruler-tick.major {
+            height: 9px;
+        }
+        .ruler-tick-num {
+            position: absolute;
+            bottom: 8px;
+            transform: translateX(-50%);
+            font-size: 9px;
+        }
+
+        /* 5. مساحة العمل (عرض صفحات المستند كصفحات Word بيضاء حقيقية) */
+        .word-canvas-viewport {
             flex: 1;
             overflow: auto;
-            background: #525659;
+            background-color: #e5e5e5;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 15px;
-            gap: 20px;
+            padding: 30px 10px 60px 10px;
+            gap: 25px;
         }
-        .page-canvas-wrapper {
+        .word-page-sheet {
             position: relative;
             background: #ffffff;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.18), 0 0 1px rgba(0,0,0,0.1);
         }
-        .canvas-overlay-layer {
+        .word-interaction-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            cursor: default;
+            cursor: text;
         }
 
-        /* كائن قابل للتحريك وإعادة التحجيم مثل Word */
-        .interactive-box {
+        /* كائنات قابلة للتحريك وإعادة الحجم تماماً مثل Word */
+        .word-textbox-container {
             position: absolute;
-            border: 1.5px dashed #2563eb;
-            user-select: none;
+            border: 1px dashed #0078d4;
             cursor: move;
-            z-index: 50;
-            display: inline-block;
-        }
-        .interactive-box.selected {
-            border-style: solid;
-            border-color: #e5322d;
-        }
-
-        .text-inner-content {
-            outline: none;
-            background: rgba(255, 255, 255, 0.85);
+            user-select: none;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.9);
             padding: 2px 6px;
             min-width: 40px;
+        }
+        .word-textbox-container.selected {
+            border: 1px solid #1054a3;
+            box-shadow: 0 0 0 1px #1054a3;
+        }
+        .word-text-editable {
+            outline: none;
+            cursor: text;
             display: inline-block;
+            width: 100%;
+            word-break: break-word;
         }
 
-        .image-inner-content {
+        /* صندوق الصورة التفاعلية مع 4 مقابض للزوايا */
+        .word-image-container {
+            position: absolute;
+            border: 1.5px solid #0078d4;
+            cursor: move;
+            z-index: 20;
+        }
+        .word-image-content {
             width: 100%;
             height: 100%;
             display: block;
             pointer-events: none;
         }
-
-        /* مقبض تغيير الحجم للصور والعناصر */
-        .resize-handle {
+        .corner-handle {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 9px;
+            height: 9px;
             background: #ffffff;
-            border: 2px solid #e5322d;
+            border: 1.5px solid #0078d4;
             border-radius: 50%;
-            bottom: -5px;
-            right: -5px;
-            cursor: se-resize;
-            z-index: 60;
+        }
+        .handle-se { right: -5px; bottom: -5px; cursor: se-resize; }
+        .handle-sw { left: -5px; bottom: -5px; cursor: sw-resize; }
+        .handle-ne { right: -5px; top: -5px; cursor: ne-resize; }
+        .handle-nw { left: -5px; top: -5px; cursor: nw-resize; }
+
+        /* تغطية بيضاء (الممحاة) */
+        .word-whiteout-block {
+            position: absolute;
+            background-color: #ffffff;
+            border: 1px dashed #b3b0ad;
+            cursor: move;
+            z-index: 10;
         }
 
-        /* اللوحة الجانبية اليمنى للصفحات */
-        .right-thumbnails-panel {
-            width: 140px;
-            background: #ffffff;
-            border-right: 1px solid #e2e8f0;
-            overflow-y: auto;
-            padding: 15px 10px;
+        /* 6. شريط الحالة السفلي المطابق للصورة الثالثة بدقة */
+        .word-status-bar {
+            background-color: #ffffff;
+            border-top: 1px solid #edebe9;
+            height: 26px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
             align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            font-size: 11px;
+            color: #605e5c;
+            direction: ltr;
         }
-        .thumb-box {
-            border: 2px solid transparent;
-            border-radius: 4px;
+        .status-left, .status-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .status-badge {
+            background: #edebe9;
+            padding: 2px 6px;
+            border-radius: 2px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
         }
-        .thumb-box.active { border-color: #e5322d; }
-        .thumb-box canvas { display: block; max-width: 100px; height: auto; }
-        .thumb-page-num { font-size: 12px; font-weight: 600; color: #64748b; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-    <header class="top-navbar">
-        <a href="../index.html" class="nav-brand">
-            <i class="fa-solid fa-file-pdf"></i> MyPDF
-        </a>
-
-        <div class="main-tools-bar">
-            <button class="tool-action-btn active" id="btnHand" onclick="setActiveTool('hand')" title="تحديد وتحريك">
-                <i class="fa-solid fa-arrow-pointer"></i> تحديد
-            </button>
-            <button class="tool-action-btn" id="btnText" onclick="setActiveTool('text')" title="إضافة نص">
-                <i class="fa-solid fa-font"></i> كتابة نص
-            </button>
-            <button class="tool-action-btn" onclick="document.getElementById('imgFile').click()" title="إضافة صورة">
-                <i class="fa-solid fa-image"></i> صورة
-            </button>
-            <button class="tool-action-btn" id="btnEraser" onclick="setActiveTool('eraser')" title="مسح وتغطية">
-                <i class="fa-solid fa-eraser"></i> ممحاة
-            </button>
-            <input type="file" id="imgFile" accept="image/*" style="display: none;" onchange="handleImageAdd(event)">
+    <!-- الشريط العلوي الرئيسي -->
+    <div class="word-header-top">
+        <div class="word-brand-title">
+            <i class="fa-solid fa-file-word" style="font-size: 20px;"></i>
+            <span>Word | محرر المستندات</span>
         </div>
-
-        <a href="../index.html" class="tool-action-btn">
-            <i class="fa-solid fa-xmark"></i> خروج
-        </a>
-    </header>
-
-    <div class="text-properties-bar">
-        <select id="fontSize" class="prop-select">
-            <option value="14">14 pt</option>
-            <option value="16" selected>16 pt</option>
-            <option value="20">20 pt</option>
-            <option value="28">28 pt</option>
-            <option value="36">36 pt</option>
-        </select>
-        <button class="prop-btn" id="boldBtn" onclick="toggleBold()">B</button>
-        <input type="color" id="textColor" class="prop-input" style="padding: 1px; width: 34px; height: 32px;" value="#000000">
+        <button class="btn-word-save" onclick="saveWordDocument()">
+            <i class="fa-solid fa-floppy-disk"></i> حفظ المستند وتنزيله
+        </button>
     </div>
 
-    <div class="workspace">
-        <div class="left-sidebar">
-            <div>
-                <h3 class="sidebar-title">العناصر المعدلة</h3>
-                <div class="elements-list" id="addedItemsList"></div>
-            </div>
+    <!-- تبويبات Word الرئيسية -->
+    <div class="word-ribbon-tabs">
+        <span class="ribbon-tab">File</span>
+        <span class="ribbon-tab active">Home</span>
+        <span class="ribbon-tab" onclick="document.getElementById('wordImgInput').click()">Insert Image</span>
+        <span class="ribbon-tab">Layout</span>
+        <span class="ribbon-tab">Review</span>
+        <span class="ribbon-tab">View</span>
+        <input type="file" id="wordImgInput" accept="image/*" style="display: none;" onchange="insertImageIntoWord(event)">
+    </div>
 
-            <button class="btn-save-red" id="saveFinalBtn" onclick="saveAndProcessPDF()">
-                حفظ التغييرات <i class="fa-solid fa-arrow-left"></i>
+    <!-- شريط أدوات الخط والفقرة المتكامل المماثل للصورة تماماً -->
+    <div class="word-toolbar-strip">
+        <!-- تراجع وإعادة -->
+        <div class="toolbar-group">
+            <button class="toolbar-btn" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="toolbar-btn" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+
+        <!-- الخط والحجم -->
+        <div class="toolbar-group">
+            <select id="fontFamilySelect" class="toolbar-select" style="width: 110px;">
+                <option value="Calibri" selected>Calibri</option>
+                <option value="Cairo">Cairo (عربي)</option>
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+            </select>
+            <select id="fontSizeSelect" class="toolbar-select" style="width: 55px;" onchange="changeActiveFontSize(this.value)">
+                <option value="11" selected>11</option>
+                <option value="12">12</option>
+                <option value="14">14</option>
+                <option value="16">16</option>
+                <option value="18">18</option>
+                <option value="24">24</option>
+                <option value="32">32</option>
+            </select>
+        </div>
+
+        <!-- تنسيق النص -->
+        <div class="toolbar-group">
+            <button class="toolbar-btn" id="btnBold" onclick="toggleStyle('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="toolbar-btn" id="btnItalic" onclick="toggleStyle('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button class="toolbar-btn" id="btnUnderline" onclick="toggleStyle('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+            <button class="toolbar-btn" id="btnStrike" onclick="toggleStyle('strike')" title="Strikethrough"><s>ab</s></button>
+            <button class="toolbar-btn" title="Text Color" style="position: relative;">
+                <i class="fa-solid fa-font"></i>
+                <input type="color" id="wordTextColor" style="position: absolute; opacity: 0; inset: 0; cursor: pointer;" value="#000000" onchange="changeActiveColor(this.value)">
             </button>
         </div>
 
-        <div class="pdf-viewer-area" id="pdfScrollContainer">
-            <p id="waitText" style="color: #fff; margin-top: 50px;">جاري تحميل صفحات المستند...</p>
+        <!-- أدوات المحاذاة والإدراج -->
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="setTextAlign('left')"><i class="fa-solid fa-align-left"></i></button>
+            <button class="toolbar-btn" onclick="setTextAlign('center')"><i class="fa-solid fa-align-center"></i></button>
+            <button class="toolbar-btn" onclick="setTextAlign('right')"><i class="fa-solid fa-align-right"></i></button>
         </div>
 
-        <div class="right-thumbnails-panel" id="thumbsPanel"></div>
+        <!-- أدوات التعديل الخاصة بالـ PDF (ممحاة، نص حر) -->
+        <div class="toolbar-group">
+            <button class="toolbar-btn" id="toolTextBtn" onclick="activateWordTool('text')" title="أداة كتابة النص">
+                <i class="fa-solid fa-i-cursor"></i> كتابة نص
+            </button>
+            <button class="toolbar-btn" id="toolEraserBtn" onclick="activateWordTool('eraser')" title="أداة المسح والتغطية">
+                <i class="fa-solid fa-eraser"></i> مسح نص
+            </button>
+        </div>
+    </div>
+
+    <!-- مسطرة Word العلوية -->
+    <div class="word-ruler-bar" id="wordRuler">
+        <!-- تتولد نقاط المسطرة تلقائياً بالـ JS -->
+    </div>
+
+    <!-- مساحة العمل وعرض المستند كصفحات حقيقية -->
+    <div class="word-canvas-viewport" id="pagesViewport">
+        <p id="wordLoading" style="color: #605e5c; margin-top: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> جاري تحميل مستند Word...</p>
+    </div>
+
+    <!-- شريط الحالة السفلي (مطابق للصورة تماماً) -->
+    <div class="word-status-bar">
+        <div class="status-left">
+            <span id="statusBarPage">Page 1 of 1</span>
+            <span class="status-badge">Spelling <i class="fa-solid fa-caret-down"></i></span>
+        </div>
+        <div class="status-right">
+            <i class="fa-regular fa-file-lines" style="cursor: pointer;"></i>
+            <i class="fa-solid fa-book-open" style="cursor: pointer;"></i>
+            <span>100% <i class="fa-solid fa-caret-down"></i></span>
+        </div>
     </div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        let currentTool = 'hand';
-        let isBold = false;
-        let pdfInstance = null;
-        let scaleRatio = 1.25;
-        let editsList = [];
-        let elementCounter = 1;
-        let activeSelectedEl = null;
+        let currentActiveTool = 'text';
+        let pdfDoc = null;
+        let scale = 1.35;
+        let editsCollection = [];
+        let activeSelectedElement = null;
 
-        function setActiveTool(tool) {
-            currentTool = tool;
-            document.querySelectorAll('.tool-action-btn').forEach(b => b.classList.remove('active'));
-            if(tool === 'hand') document.getElementById('btnHand').classList.add('active');
-            if(tool === 'text') document.getElementById('btnText').classList.add('active');
-            if(tool === 'eraser') document.getElementById('btnEraser').classList.add('active');
-        }
-
-        function toggleBold() {
-            isBold = !isBold;
-            document.getElementById('boldBtn').classList.toggle('active', isBold);
-            if (activeSelectedEl && activeSelectedEl.dataset.type === 'text') {
-                const inner = activeSelectedEl.querySelector('.text-inner-content');
-                inner.style.fontWeight = isBold ? 'bold' : 'normal';
+        // توليد نقاط المسطرة
+        function initRuler() {
+            const ruler = document.getElementById('wordRuler');
+            for (let i = 0; i <= 1000; i += 36) {
+                const tick = document.createElement('div');
+                tick.className = 'ruler-tick' + (i % 72 === 0 ? ' major' : '');
+                tick.style.left = `${i}px`;
+                if (i > 0 && i % 72 === 0) {
+                    const num = document.createElement('div');
+                    num.className = 'ruler-tick-num';
+                    num.style.left = `${i}px`;
+                    num.innerText = i;
+                    ruler.appendChild(num);
+                }
+                ruler.appendChild(tick);
             }
+        }
+        initRuler();
+
+        function activateWordTool(tool) {
+            currentActiveTool = tool;
+            document.getElementById('toolTextBtn').classList.toggle('active', tool === 'text');
+            document.getElementById('toolEraserBtn').classList.toggle('active', tool === 'eraser');
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            const pdfBase64 = sessionStorage.getItem('pdf_to_edit');
-            if (!pdfBase64) {
-                document.getElementById('waitText').innerText = 'لم يتم اختيار ملف. الرجاء العودة والبدء من جديد.';
+            const rawPdf = sessionStorage.getItem('pdf_to_edit');
+            if (!rawPdf) {
+                document.getElementById('wordLoading').innerText = 'لم يتم تحديد أي ملف. الرجاء العودة والبدء من جديد.';
                 return;
             }
 
             try {
-                pdfInstance = await pdfjsLib.getDocument(pdfBase64).promise;
-                document.getElementById('waitText').remove();
+                pdfDoc = await pdfjsLib.getDocument(rawPdf).promise;
+                document.getElementById('wordLoading').remove();
+                document.getElementById('statusBarPage').innerText = `Page 1 of ${pdfDoc.numPages}`;
 
-                for (let i = 1; i <= pdfInstance.numPages; i++) {
-                    const page = await pdfInstance.getPage(i);
-                    const viewport = page.getViewport({ scale: scaleRatio });
+                for (let num = 1; num <= pdfDoc.numPages; num++) {
+                    const page = await pdfDoc.getPage(num);
+                    const viewport = page.getViewport({ scale: scale });
 
-                    const pageWrapper = document.createElement('div');
-                    pageWrapper.className = 'page-canvas-wrapper';
-                    pageWrapper.id = `page-wrap-${i}`;
-                    pageWrapper.style.width = `${viewport.width}px`;
-                    pageWrapper.style.height = `${viewport.height}px`;
+                    const pageSheet = document.createElement('div');
+                    pageSheet.className = 'word-page-sheet';
+                    pageSheet.style.width = `${viewport.width}px`;
+                    pageSheet.style.height = `${viewport.height}px`;
 
                     const canvas = document.createElement('canvas');
                     canvas.width = viewport.width;
                     canvas.height = viewport.height;
                     await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
 
-                    const overlay = document.createElement('div');
-                    overlay.className = 'canvas-overlay-layer';
-                    overlay.dataset.page = i;
-                    setupPageInteraction(overlay, i);
+                    const interactionLayer = document.createElement('div');
+                    interactionLayer.className = 'word-interaction-layer';
+                    interactionLayer.dataset.page = num;
+                    setupSheetEvents(interactionLayer, num);
 
-                    pageWrapper.appendChild(canvas);
-                    pageWrapper.appendChild(overlay);
-                    document.getElementById('pdfScrollContainer').appendChild(pageWrapper);
-
-                    generateThumbnail(page, i);
+                    pageSheet.appendChild(canvas);
+                    pageSheet.appendChild(interactionLayer);
+                    document.getElementById('pagesViewport').appendChild(pageSheet);
                 }
-            } catch (err) {
-                document.getElementById('waitText').innerText = 'تعذر قراءة الملف: ' + err.message;
+            } catch (e) {
+                document.getElementById('wordLoading').innerText = 'خطأ في فتح الملف: ' + e.message;
             }
         });
 
-        async function generateThumbnail(page, pageNum) {
-            const thumbViewport = page.getViewport({ scale: 0.18 });
-            const thumbBox = document.createElement('div');
-            thumbBox.className = `thumb-box ${pageNum === 1 ? 'active' : ''}`;
-            thumbBox.onclick = () => {
-                document.querySelectorAll('.thumb-box').forEach(b => b.classList.remove('active'));
-                thumbBox.classList.add('active');
-                document.getElementById(`page-wrap-${pageNum}`).scrollIntoView({ behavior: 'smooth' });
-            };
+        function setupSheetEvents(layer, pageNum) {
+            layer.addEventListener('click', (e) => {
+                if (e.target !== layer) return;
 
-            const tCanvas = document.createElement('canvas');
-            tCanvas.width = thumbViewport.width;
-            tCanvas.height = thumbViewport.height;
-            await page.render({ canvasContext: tCanvas.getContext('2d'), viewport: thumbViewport }).promise;
+                if (currentActiveTool === 'text') {
+                    const rect = layer.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    createWordTextBox(layer, pageNum, x, y);
+                }
+            });
 
-            const label = document.createElement('div');
-            label.className = 'thumb-page-num';
-            label.innerText = pageNum;
+            // أداة الممحاة (رسم مستطيل أبيض)
+            let isErasing = false;
+            let eraseBox = null;
+            let startX, startY;
 
-            thumbBox.appendChild(tCanvas);
-            thumbBox.appendChild(label);
-            document.getElementById('thumbsPanel').appendChild(thumbBox);
-        }
+            layer.addEventListener('mousedown', (e) => {
+                if (currentActiveTool !== 'eraser' || e.target !== layer) return;
+                isErasing = true;
+                const rect = layer.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
 
-        function setupPageInteraction(overlay, pageNum) {
-            overlay.addEventListener('click', (e) => {
-                if (currentTool !== 'text' || e.target !== overlay) return;
-                const rect = overlay.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                eraseBox = document.createElement('div');
+                eraseBox.className = 'word-whiteout-block';
+                eraseBox.style.left = startX + 'px';
+                eraseBox.style.top = startY + 'px';
+                layer.appendChild(eraseBox);
+            });
 
-                const fontSz = document.getElementById('fontSize').value;
-                const colorVal = document.getElementById('textColor').value;
-                const itemId = 'item_' + Date.now();
-                const defaultText = 'أدخل النص هنا';
+            layer.addEventListener('mousemove', (e) => {
+                if (!isErasing || !eraseBox) return;
+                const rect = layer.getBoundingClientRect();
+                const curX = e.clientX - rect.left;
+                const curY = e.clientY - rect.top;
 
-                const box = document.createElement('div');
-                box.className = 'interactive-box selected';
-                box.id = itemId;
-                box.dataset.type = 'text';
-                box.style.left = `${x}px`;
-                box.style.top = `${y}px`;
+                eraseBox.style.width = Math.abs(curX - startX) + 'px';
+                eraseBox.style.height = Math.abs(curY - startY) + 'px';
+                eraseBox.style.left = Math.min(curX, startX) + 'px';
+                eraseBox.style.top = Math.min(curY, startY) + 'px';
+            });
 
-                const inner = document.createElement('div');
-                inner.className = 'text-inner-content';
-                inner.contentEditable = 'true';
-                inner.innerText = defaultText;
-                inner.style.fontSize = `${fontSz}px`;
-                inner.style.color = colorVal;
-                if (isBold) inner.style.fontWeight = 'bold';
-
-                box.appendChild(inner);
-                overlay.appendChild(box);
-
-                selectElement(box);
-                makeInteractive(box, pageNum);
-                addToLeftPanel(itemId, defaultText, pageNum);
-
-                editsList.push({
-                    id: itemId,
-                    type: 'text',
-                    page: pageNum,
-                    x: x / scaleRatio,
-                    y: y / scaleRatio,
-                    text: defaultText,
-                    fontSize: parseInt(fontSz),
-                    color: colorVal
-                });
-
-                inner.focus();
-                inner.oninput = () => {
-                    const item = editsList.find(i => i.id === itemId);
-                    if (item) item.text = inner.innerText;
-                };
-
-                setActiveTool('hand');
+            layer.addEventListener('mouseup', () => {
+                if (isErasing && eraseBox) {
+                    isErasing = false;
+                    const w = parseFloat(eraseBox.style.width);
+                    const h = parseFloat(eraseBox.style.height);
+                    if (w > 5 && h > 5) {
+                        editsCollection.push({
+                            type: 'whiteout',
+                            page: pageNum,
+                            x: parseFloat(eraseBox.style.left) / scale,
+                            y: parseFloat(eraseBox.style.top) / scale,
+                            width: w / scale,
+                            height: h / scale
+                        });
+                    } else {
+                        eraseBox.remove();
+                    }
+                    eraseBox = null;
+                }
             });
         }
 
-        function selectElement(el) {
-            if (activeSelectedEl) activeSelectedEl.classList.remove('selected');
-            activeSelectedEl = el;
+        function createWordTextBox(layer, pageNum, x, y) {
+            const boxId = 'text_' + Date.now();
+            const box = document.createElement('div');
+            box.className = 'word-textbox-container selected';
+            box.id = boxId;
+            box.style.left = `${x}px`;
+            box.style.top = `${y}px`;
+
+            const editable = document.createElement('div');
+            editable.className = 'word-text-editable';
+            editable.contentEditable = 'true';
+            editable.innerText = 'اكتب هنا...';
+            editable.style.fontSize = document.getElementById('fontSizeSelect').value + 'pt';
+
+            box.appendChild(editable);
+            layer.appendChild(box);
+
+            selectWordElement(box);
+            makeWordDraggable(box, pageNum);
+
+            editable.focus();
+            document.execCommand('selectAll', false, null);
+
+            editsCollection.push({
+                id: boxId,
+                type: 'text',
+                page: pageNum,
+                x: x / scale,
+                y: y / scale,
+                text: 'اكتب هنا...',
+                fontSize: parseInt(document.getElementById('fontSizeSelect').value),
+                color: document.getElementById('wordTextColor').value
+            });
+
+            editable.oninput = () => {
+                const item = editsCollection.find(i => i.id === boxId);
+                if (item) item.text = editable.innerText;
+            };
+        }
+
+        function selectWordElement(el) {
+            if (activeSelectedElement) activeSelectedElement.classList.remove('selected');
+            activeSelectedElement = el;
             if (el) el.classList.add('selected');
         }
 
-        function makeInteractive(box, pageNum) {
-            // سحب وتغيير مكان العنصر
+        function makeWordDraggable(box, pageNum) {
             let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
+            let startX, startY, initLeft, initTop;
 
             box.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('resize-handle') || e.target.contentEditable === 'true') return;
-                selectElement(box);
+                if (e.target.classList.contains('corner-handle') || e.target.isContentEditable) return;
+                selectWordElement(box);
                 isDragging = true;
                 startX = e.clientX;
                 startY = e.clientY;
-                initialLeft = box.offsetLeft;
-                initialTop = box.offsetTop;
+                initLeft = box.offsetLeft;
+                initTop = box.offsetTop;
 
-                const onMouseMove = (moveEvt) => {
+                const onMove = (ev) => {
                     if (!isDragging) return;
-                    const dx = moveEvt.clientX - startX;
-                    const dy = moveEvt.clientY - startY;
-                    box.style.left = `${initialLeft + dx}px`;
-                    box.style.top = `${initialTop + dy}px`;
+                    box.style.left = (initLeft + (ev.clientX - startX)) + 'px';
+                    box.style.top = (initTop + (ev.clientY - startY)) + 'px';
                 };
 
-                const onMouseUp = () => {
+                const onUp = () => {
                     isDragging = false;
-                    window.removeEventListener('mousemove', onMouseMove);
-                    window.removeEventListener('mouseup', onMouseUp);
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
 
-                    const found = editsList.find(i => i.id === box.id);
+                    const found = editsCollection.find(i => i.id === box.id);
                     if (found) {
-                        found.x = box.offsetLeft / scaleRatio;
-                        found.y = box.offsetTop / scaleRatio;
+                        found.x = box.offsetLeft / scale;
+                        found.y = box.offsetTop / scale;
                     }
                 };
 
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
             });
-
-            // تغيير حجم الصورة بواسطة المقبض
-            const handle = box.querySelector('.resize-handle');
-            if (handle) {
-                handle.addEventListener('mousedown', (e) => {
-                    e.stopPropagation();
-                    let startW = box.offsetWidth;
-                    let startX = e.clientX;
-
-                    const onResize = (ev) => {
-                        const newWidth = Math.max(40, startW + (ev.clientX - startX));
-                        box.style.width = `${newWidth}px`;
-                    };
-
-                    const onStopResize = () => {
-                        window.removeEventListener('mousemove', onResize);
-                        window.removeEventListener('mouseup', onStopResize);
-
-                        const found = editsList.find(i => i.id === box.id);
-                        if (found) {
-                            found.width = box.offsetWidth / scaleRatio;
-                        }
-                    };
-
-                    window.addEventListener('mousemove', onResize);
-                    window.addEventListener('mouseup', onStopResize);
-                });
-            }
         }
 
-        function handleImageAdd(e) {
+        function insertImageIntoWord(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = (evt) => {
-                const itemId = 'img_' + Date.now();
+                const imgId = 'img_' + Date.now();
                 const box = document.createElement('div');
-                box.className = 'interactive-box selected';
-                box.id = itemId;
-                box.dataset.type = 'image';
+                box.className = 'word-image-container';
+                box.id = imgId;
                 box.style.left = '60px';
                 box.style.top = '60px';
-                box.style.width = '140px';
+                box.style.width = '160px';
+                box.style.height = '120px';
 
                 const img = document.createElement('img');
                 img.src = evt.target.result;
-                img.className = 'image-inner-content';
+                img.className = 'word-image-content';
 
-                const handle = document.createElement('div');
-                handle.className = 'resize-handle';
+                // مقابض التحجيم الـ 4
+                ['se', 'sw', 'ne', 'nw'].forEach(dir => {
+                    const handle = document.createElement('div');
+                    handle.className = `corner-handle handle-${dir}`;
+                    handle.dataset.dir = dir;
+                    box.appendChild(handle);
+                    attachResizeHandler(handle, box, imgId);
+                });
 
                 box.appendChild(img);
-                box.appendChild(handle);
+                const firstLayer = document.querySelector('.word-interaction-layer');
+                if (firstLayer) {
+                    firstLayer.appendChild(box);
+                    selectWordElement(box);
+                    makeWordDraggable(box, 1);
 
-                const firstOverlay = document.querySelector('.canvas-overlay-layer');
-                if (firstOverlay) {
-                    firstOverlay.appendChild(box);
-                    selectElement(box);
-                    makeInteractive(box, 1);
-                    addToLeftPanel(itemId, 'صورة مضافة', 1);
-
-                    editsList.push({
-                        id: itemId,
+                    editsCollection.push({
+                        id: imgId,
                         type: 'image',
                         page: 1,
-                        x: 60 / scaleRatio,
-                        y: 60 / scaleRatio,
-                        width: 140 / scaleRatio,
+                        x: 60 / scale,
+                        y: 60 / scale,
+                        width: 160 / scale,
                         imageData: evt.target.result
                     });
                 }
@@ -534,32 +633,79 @@
             reader.readAsDataURL(file);
         }
 
-        function addToLeftPanel(id, text, pageNum) {
-            const row = document.createElement('div');
-            row.className = 'element-row';
-            row.id = `row_${id}`;
-            row.innerHTML = `
-                <span>${text} (صفحة ${pageNum})</span>
-                <i class="fa-solid fa-trash del-btn" onclick="removeItem('${id}')"></i>
-            `;
-            document.getElementById('addedItemsList').appendChild(row);
+        function attachResizeHandler(handle, box, itemId) {
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                let startX = e.clientX;
+                let startW = box.offsetWidth;
+
+                const onResize = (ev) => {
+                    const newW = Math.max(40, startW + (ev.clientX - startX));
+                    box.style.width = newW + 'px';
+                    box.style.height = (newW * 0.75) + 'px';
+                };
+
+                const onStop = () => {
+                    window.removeEventListener('mousemove', onResize);
+                    window.removeEventListener('mouseup', onStop);
+                    const found = editsCollection.find(i => i.id === itemId);
+                    if (found) {
+                        found.width = box.offsetWidth / scale;
+                    }
+                };
+
+                window.addEventListener('mousemove', onResize);
+                window.addEventListener('mouseup', onStop);
+            });
         }
 
-        function removeItem(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-            const row = document.getElementById(`row_${id}`);
-            if (row) row.remove();
-            editsList = editsList.filter(i => i.id !== id);
+        // تنسيقات الخط
+        function toggleStyle(style) {
+            if (!activeSelectedElement) return;
+            const ed = activeSelectedElement.querySelector('.word-text-editable');
+            if (!ed) return;
+            if (style === 'bold') ed.style.fontWeight = ed.style.fontWeight === 'bold' ? 'normal' : 'bold';
+            if (style === 'italic') ed.style.fontStyle = ed.style.fontStyle === 'italic' ? 'normal' : 'italic';
+            if (style === 'underline') ed.style.textDecoration = ed.style.textDecoration === 'underline' ? 'none' : 'underline';
+            if (style === 'strike') ed.style.textDecoration = ed.style.textDecoration === 'line-through' ? 'none' : 'line-through';
         }
 
-        async function saveAndProcessPDF() {
-            const saveBtn = document.getElementById('saveFinalBtn');
-            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ والتصدير...';
-            saveBtn.disabled = true;
+        function changeActiveFontSize(size) {
+            if (activeSelectedElement) {
+                const ed = activeSelectedElement.querySelector('.word-text-editable');
+                if (ed) {
+                    ed.style.fontSize = size + 'pt';
+                    const found = editsCollection.find(i => i.id === activeSelectedElement.id);
+                    if (found) found.fontSize = parseInt(size);
+                }
+            }
+        }
 
+        function changeActiveColor(color) {
+            if (activeSelectedElement) {
+                const ed = activeSelectedElement.querySelector('.word-text-editable');
+                if (ed) {
+                    ed.style.color = color;
+                    const found = editsCollection.find(i => i.id === activeSelectedElement.id);
+                    if (found) found.color = color;
+                }
+            }
+        }
+
+        function setTextAlign(align) {
+            if (activeSelectedElement) {
+                const ed = activeSelectedElement.querySelector('.word-text-editable');
+                if (ed) ed.style.textAlign = align;
+            }
+        }
+
+        async function saveWordDocument() {
             const rawPdf = sessionStorage.getItem('pdf_to_edit');
             const pdfName = sessionStorage.getItem('pdf_name') || 'document.pdf';
+            const saveBtn = document.querySelector('.btn-word-save');
+
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري حفظ المستند...';
+            saveBtn.disabled = true;
 
             try {
                 const res = await fetch(rawPdf);
@@ -569,39 +715,40 @@
                 const formData = new FormData();
                 formData.append('files', file);
                 formData.append('operation', 'edit');
-                formData.append('edits_data', JSON.stringify(editsList));
+                formData.append('edits_data', JSON.stringify(editsCollection));
 
                 const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
                     ? 'http://127.0.0.1:8080/api/v1'
                     : 'https://mypdf-platform.onrender.com/api/v1';
 
-                const upRes = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
-                const upData = await upRes.json();
+                const response = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+                const data = await response.json();
 
-                if (upRes.ok && upData.success) {
-                    const timer = setInterval(async () => {
-                        const jRes = await fetch(`${API_URL}/jobs/${encodeURIComponent(upData.job_id)}`);
-                        const jData = await jRes.json();
-                        if (jData.success && jData.job.status === 'COMPLETED') {
-                            clearInterval(timer);
-                            window.location.href = `${API_URL}/download/${encodeURIComponent(jData.job.job_id)}/${encodeURIComponent(jData.job.output_file)}`;
-                            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> اكتمل التحميل!';
+                if (response.ok && data.success) {
+                    const checkInterval = setInterval(async () => {
+                        const jobRes = await fetch(`${API_URL}/jobs/${encodeURIComponent(data.job_id)}`);
+                        const jobData = await jobRes.json();
+
+                        if (jobData.success && jobData.job.status === 'COMPLETED') {
+                            clearInterval(checkInterval);
+                            window.location.href = `${API_URL}/download/${encodeURIComponent(jobData.job.job_id)}/${encodeURIComponent(jobData.job.output_file)}`;
+                            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> تم التنزيل بنجاح!';
                             saveBtn.disabled = false;
-                        } else if (jData.job.status === 'FAILED') {
-                            clearInterval(timer);
-                            alert('حدث خطأ أثناء المعالجة: ' + jData.job.error);
-                            saveBtn.innerHTML = 'حفظ التغييرات <i class="fa-solid fa-arrow-left"></i>';
+                        } else if (jobData.job.status === 'FAILED') {
+                            clearInterval(checkInterval);
+                            alert('حدث خطأ أثناء المعالجة: ' + jobData.job.error);
+                            saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> إعادة المحاولة';
                             saveBtn.disabled = false;
                         }
                     }, 1500);
                 } else {
-                    alert('فشل الرفع: ' + (upData.detail || ''));
-                    saveBtn.innerHTML = 'حفظ التغييرات <i class="fa-solid fa-arrow-left"></i>';
+                    alert('خطأ في السيرفر: ' + (data.detail || ''));
+                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> إعادة المحاولة';
                     saveBtn.disabled = false;
                 }
             } catch (err) {
-                alert('تعذر الاتصال بالخادم: ' + err.message);
-                saveBtn.innerHTML = 'حفظ التغييرات <i class="fa-solid fa-arrow-left"></i>';
+                alert('تعذر الاتصال بالسيرفر: ' + err.message);
+                saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> إعادة المحاولة';
                 saveBtn.disabled = false;
             }
         }
