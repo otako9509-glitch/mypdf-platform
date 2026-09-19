@@ -1,3 +1,3 @@
-from .text import edit_pdf_text
+from .text import apply_pdf_edits
 
-__all__ = ['edit_pdf_text']
+__all__ = ['apply_pdf_edits']
