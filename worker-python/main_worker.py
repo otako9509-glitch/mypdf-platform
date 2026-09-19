@@ -20,6 +20,8 @@ from processors import (
     rotate_pdf, organize_pdf, pdf_to_jpg,
     jpg_to_pdf, add_text_watermark, protect_pdf, unlock_pdf
 )
+# استيراد معالج التعديل
+from editors.text import apply_pdf_edits
 
 # إعداد السجلات (Logging)
 logging.basicConfig(
@@ -44,7 +46,7 @@ def update_db_job(job_id: str, status: JobStatus, output_file: str = None, error
     """تحديث حالة المهمة مباشرة داخل قاعدة البيانات"""
     try:
         with SessionLocal() as session:
-            job = session.query(Job).filter(Job.job_id == job_id).first()
+            job = session.query(Job).filter(Job.id == job_id).first()
             if job:
                 job.status = status
                 if output_file:
@@ -71,7 +73,16 @@ def process_job(payload: dict):
     out_filename = f"{job_id}_processed.pdf"
     target_out_path = out_dir / out_filename
 
-    input_paths = [f["path"] for f in input_files if "path" in f and Path(f["path"]).is_file()]
+    # استخراج مسارات الملفات من المدخلات
+    input_paths = []
+    for f in input_files:
+        p = f.get("path") or f.get("stored_name")
+        if p:
+            # التحقق إذا كان مساراً كاملاً أو داخل storage/uploads
+            full_path = Path(p) if Path(p).is_file() else PROJECT_ROOT / "storage" / "uploads" / p
+            if full_path.is_file():
+                input_paths.append(str(full_path))
+
     if not input_paths:
         raise FileNotFoundError("Input files not found on disk.")
 
@@ -99,6 +110,10 @@ def process_job(payload: dict):
         protect_pdf(input_paths[0], str(target_out_path), password=options.get("password", "123456"))
     elif operation == "unlock":
         unlock_pdf(input_paths[0], str(target_out_path), password=options.get("password", ""))
+    elif operation == "edit":
+        raw_edits = payload.get("edits_data") or options.get("edits_data", [])
+        edits = json.loads(raw_edits) if isinstance(raw_edits, str) else raw_edits
+        apply_pdf_edits(input_paths[0], str(target_out_path), edits or [])
     else:
         raise ValueError(f"Unknown operation: {operation}")
 
