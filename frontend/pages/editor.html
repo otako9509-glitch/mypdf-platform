@@ -11,7 +11,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: #f4f5f8; color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* 1. الرأس وشريط الأدوات العلوي */
+        /* شريط الأدوات العلوي */
         .top-navbar {
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
@@ -20,16 +20,11 @@
             justify-content: space-between;
             padding: 8px 24px;
             height: 60px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
             z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
         .nav-brand { font-size: 22px; font-weight: 800; color: #e5322d; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        
-        .main-tools-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .main-tools-bar { display: flex; align-items: center; gap: 8px; }
         .tool-action-btn {
             background: transparent;
             border: 1px solid transparent;
@@ -37,7 +32,7 @@
             padding: 8px 14px;
             cursor: pointer;
             color: #4a5568;
-            font-size: 17px;
+            font-size: 16px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -46,7 +41,7 @@
         .tool-action-btn:hover { background: #f1f5f9; color: #000; }
         .tool-action-btn.active { background: #fee2e2; color: #e5322d; border-color: #fca5a5; }
 
-        /* شريط خصائص النص */
+        /* شريط تنسيق الخط */
         .text-properties-bar {
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
@@ -79,15 +74,9 @@
         }
         .prop-btn.active { background: #e2e8f0; border-color: #94a3b8; }
 
-        /* 2. منطقة العمل الرئيسية */
-        .workspace {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* اللوحة الجانبية اليسرى (العناصر وزر الحفظ) */
+        /* مساحة العمل */
+        .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }
+        
         .left-sidebar {
             width: 280px;
             background: #ffffff;
@@ -98,7 +87,7 @@
             padding: 20px 16px;
             z-index: 10;
         }
-        .sidebar-title { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
+        .sidebar-title { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
         .elements-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .element-row {
             background: #f8fafc;
@@ -108,9 +97,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 13px;
         }
-        .element-row .del-btn { color: #94a3b8; cursor: pointer; transition: 0.2s; }
+        .element-row .del-btn { color: #94a3b8; cursor: pointer; }
         .element-row .del-btn:hover { color: #ef4444; }
 
         .btn-save-red {
@@ -127,11 +116,9 @@
             justify-content: center;
             gap: 10px;
             box-shadow: 0 4px 14px rgba(229, 50, 45, 0.3);
-            transition: background 0.2s;
         }
         .btn-save-red:hover { background: #cc2420; }
 
-        /* منطقة استعراض الـ PDF في الوسط */
         .pdf-viewer-area {
             flex: 1;
             overflow: auto;
@@ -153,24 +140,50 @@
             cursor: default;
         }
 
-        /* النصوص والعناصر فوق الـ PDF */
-        .movable-text {
+        /* كائن قابل للتحريك وإعادة التحجيم مثل Word */
+        .interactive-box {
             position: absolute;
-            cursor: move;
             border: 1.5px dashed #2563eb;
-            background: rgba(255,255,255,0.85);
-            padding: 4px 8px;
             user-select: none;
-            white-space: nowrap;
-        }
-        .whiteout-mask {
-            position: absolute;
-            background: #ffffff;
-            border: 1px dashed #94a3b8;
             cursor: move;
+            z-index: 50;
+            display: inline-block;
+        }
+        .interactive-box.selected {
+            border-style: solid;
+            border-color: #e5322d;
         }
 
-        /* اللوحة الجانبية اليمنى (Thumbnails) */
+        .text-inner-content {
+            outline: none;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2px 6px;
+            min-width: 40px;
+            display: inline-block;
+        }
+
+        .image-inner-content {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* مقبض تغيير الحجم للصور والعناصر */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border: 2px solid #e5322d;
+            border-radius: 50%;
+            bottom: -5px;
+            right: -5px;
+            cursor: se-resize;
+            z-index: 60;
+        }
+
+        /* اللوحة الجانبية اليمنى للصفحات */
         .right-thumbnails-panel {
             width: 140px;
             background: #ffffff;
@@ -196,28 +209,23 @@
 </head>
 <body>
 
-    <!-- 1. شريط التنقل العلوي مع الأدوات الأساسية -->
     <header class="top-navbar">
         <a href="../index.html" class="nav-brand">
             <i class="fa-solid fa-file-pdf"></i> MyPDF
         </a>
 
-        <!-- أدوات الإدراج المماثلة للتصميم -->
         <div class="main-tools-bar">
-            <button class="tool-action-btn active" id="btnHand" onclick="setActiveTool('hand')" title="تحريك">
-                <i class="fa-solid fa-hand"></i>
+            <button class="tool-action-btn active" id="btnHand" onclick="setActiveTool('hand')" title="تحديد وتحريك">
+                <i class="fa-solid fa-arrow-pointer"></i> تحديد
             </button>
             <button class="tool-action-btn" id="btnText" onclick="setActiveTool('text')" title="إضافة نص">
-                <i class="fa-solid fa-font"></i>
+                <i class="fa-solid fa-font"></i> كتابة نص
             </button>
             <button class="tool-action-btn" onclick="document.getElementById('imgFile').click()" title="إضافة صورة">
-                <i class="fa-solid fa-image"></i>
-            </button>
-            <button class="tool-action-btn" id="btnDraw" onclick="setActiveTool('draw')" title="قلم رسم حر">
-                <i class="fa-solid fa-pen"></i>
+                <i class="fa-solid fa-image"></i> صورة
             </button>
             <button class="tool-action-btn" id="btnEraser" onclick="setActiveTool('eraser')" title="مسح وتغطية">
-                <i class="fa-solid fa-eraser"></i>
+                <i class="fa-solid fa-eraser"></i> ممحاة
             </button>
             <input type="file" id="imgFile" accept="image/*" style="display: none;" onchange="handleImageAdd(event)">
         </div>
@@ -227,15 +235,9 @@
         </a>
     </header>
 
-    <!-- شريط تنسيق الخط -->
     <div class="text-properties-bar">
-        <select id="fontFamily" class="prop-select">
-            <option value="Cairo">Cairo (عربي)</option>
-            <option value="Arial">Arial</option>
-            <option value="Times New Roman">Times New Roman</option>
-        </select>
         <select id="fontSize" class="prop-select">
-            <option value="12">12 pt</option>
+            <option value="14">14 pt</option>
             <option value="16" selected>16 pt</option>
             <option value="20">20 pt</option>
             <option value="28">28 pt</option>
@@ -245,16 +247,11 @@
         <input type="color" id="textColor" class="prop-input" style="padding: 1px; width: 34px; height: 32px;" value="#000000">
     </div>
 
-    <!-- 2. مساحة العمل -->
     <div class="workspace">
-
-        <!-- اللوحة الجانبية اليسرى (قائمة العناصر المضافة وزر الحفظ) -->
         <div class="left-sidebar">
             <div>
-                <h3 class="sidebar-title">تعديل ملف PDF</h3>
-                <div class="elements-list" id="addedItemsList">
-                    <!-- تظهر هنا العناصر المضافة آلياً -->
-                </div>
+                <h3 class="sidebar-title">العناصر المعدلة</h3>
+                <div class="elements-list" id="addedItemsList"></div>
             </div>
 
             <button class="btn-save-red" id="saveFinalBtn" onclick="saveAndProcessPDF()">
@@ -262,16 +259,11 @@
             </button>
         </div>
 
-        <!-- منطقة استعراض صفحات PDF الوسطى -->
         <div class="pdf-viewer-area" id="pdfScrollContainer">
             <p id="waitText" style="color: #fff; margin-top: 50px;">جاري تحميل صفحات المستند...</p>
         </div>
 
-        <!-- اللوحة الجانبية اليمنى (الصور المصغرة للتنقل) -->
-        <div class="right-thumbnails-panel" id="thumbsPanel">
-            <!-- تتولد هنا مصغرات الصفحات 1، 2، 3 -->
-        </div>
-
+        <div class="right-thumbnails-panel" id="thumbsPanel"></div>
     </div>
 
     <script>
@@ -283,19 +275,23 @@
         let scaleRatio = 1.25;
         let editsList = [];
         let elementCounter = 1;
+        let activeSelectedEl = null;
 
         function setActiveTool(tool) {
             currentTool = tool;
             document.querySelectorAll('.tool-action-btn').forEach(b => b.classList.remove('active'));
             if(tool === 'hand') document.getElementById('btnHand').classList.add('active');
             if(tool === 'text') document.getElementById('btnText').classList.add('active');
-            if(tool === 'draw') document.getElementById('btnDraw').classList.add('active');
             if(tool === 'eraser') document.getElementById('btnEraser').classList.add('active');
         }
 
         function toggleBold() {
             isBold = !isBold;
             document.getElementById('boldBtn').classList.toggle('active', isBold);
+            if (activeSelectedEl && activeSelectedEl.dataset.type === 'text') {
+                const inner = activeSelectedEl.querySelector('.text-inner-content');
+                inner.style.fontWeight = isBold ? 'bold' : 'normal';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -313,7 +309,6 @@
                     const page = await pdfInstance.getPage(i);
                     const viewport = page.getViewport({ scale: scaleRatio });
 
-                    // 1. حاوية الصفحة الرئيسية
                     const pageWrapper = document.createElement('div');
                     pageWrapper.className = 'page-canvas-wrapper';
                     pageWrapper.id = `page-wrap-${i}`;
@@ -334,7 +329,6 @@
                     pageWrapper.appendChild(overlay);
                     document.getElementById('pdfScrollContainer').appendChild(pageWrapper);
 
-                    // 2. إنشاء الصورة المصغرة (Thumbnail) في الجانب الأيمن
                     generateThumbnail(page, i);
                 }
             } catch (err) {
@@ -368,34 +362,37 @@
 
         function setupPageInteraction(overlay, pageNum) {
             overlay.addEventListener('click', (e) => {
-                if (currentTool !== 'text') return;
+                if (currentTool !== 'text' || e.target !== overlay) return;
                 const rect = overlay.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
-                const textVal = prompt('أدخل النص هنا:', 'نص جديد ' + elementCounter);
-                if (!textVal) return;
-
                 const fontSz = document.getElementById('fontSize').value;
                 const colorVal = document.getElementById('textColor').value;
                 const itemId = 'item_' + Date.now();
+                const defaultText = 'أدخل النص هنا';
 
-                const textEl = document.createElement('div');
-                textEl.className = 'movable-text';
-                textEl.id = itemId;
-                textEl.innerText = textVal;
-                textEl.style.left = `${x}px`;
-                textEl.style.top = `${y}px`;
-                textEl.style.fontSize = `${fontSz}px`;
-                textEl.style.color = colorVal;
-                if (isBold) textEl.style.fontWeight = 'bold';
+                const box = document.createElement('div');
+                box.className = 'interactive-box selected';
+                box.id = itemId;
+                box.dataset.type = 'text';
+                box.style.left = `${x}px`;
+                box.style.top = `${y}px`;
 
-                // قابلية السحب والتنقل
-                makeDraggable(textEl, pageNum);
-                overlay.appendChild(textEl);
+                const inner = document.createElement('div');
+                inner.className = 'text-inner-content';
+                inner.contentEditable = 'true';
+                inner.innerText = defaultText;
+                inner.style.fontSize = `${fontSz}px`;
+                inner.style.color = colorVal;
+                if (isBold) inner.style.fontWeight = 'bold';
 
-                // إضافة للقائمة اليسرى
-                addToLeftPanel(itemId, textVal, pageNum);
+                box.appendChild(inner);
+                overlay.appendChild(box);
+
+                selectElement(box);
+                makeInteractive(box, pageNum);
+                addToLeftPanel(itemId, defaultText, pageNum);
 
                 editsList.push({
                     id: itemId,
@@ -403,41 +400,138 @@
                     page: pageNum,
                     x: x / scaleRatio,
                     y: y / scaleRatio,
-                    text: textVal,
+                    text: defaultText,
                     fontSize: parseInt(fontSz),
                     color: colorVal
                 });
 
-                elementCounter++;
+                inner.focus();
+                inner.oninput = () => {
+                    const item = editsList.find(i => i.id === itemId);
+                    if (item) item.text = inner.innerText;
+                };
+
                 setActiveTool('hand');
             });
         }
 
-        function makeDraggable(el, pageNum) {
-            let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
-            el.onmousedown = (e) => {
-                e.stopPropagation();
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                document.onmousemove = (ev) => {
-                    posX = mouseX - ev.clientX;
-                    posY = mouseY - ev.clientY;
-                    mouseX = ev.clientX;
-                    mouseY = ev.clientY;
-                    el.style.top = (el.offsetTop - posY) + "px";
-                    el.style.left = (el.offsetLeft - posX) + "px";
+        function selectElement(el) {
+            if (activeSelectedEl) activeSelectedEl.classList.remove('selected');
+            activeSelectedEl = el;
+            if (el) el.classList.add('selected');
+        }
+
+        function makeInteractive(box, pageNum) {
+            // سحب وتغيير مكان العنصر
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            box.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('resize-handle') || e.target.contentEditable === 'true') return;
+                selectElement(box);
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = box.offsetLeft;
+                initialTop = box.offsetTop;
+
+                const onMouseMove = (moveEvt) => {
+                    if (!isDragging) return;
+                    const dx = moveEvt.clientX - startX;
+                    const dy = moveEvt.clientY - startY;
+                    box.style.left = `${initialLeft + dx}px`;
+                    box.style.top = `${initialTop + dy}px`;
                 };
-                document.onmouseup = () => {
-                    document.onmousemove = null;
-                    document.onmouseup = null;
-                    // تحديث الإحداثيات في القائمة
-                    const found = editsList.find(i => i.id === el.id);
+
+                const onMouseUp = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+
+                    const found = editsList.find(i => i.id === box.id);
                     if (found) {
-                        found.x = el.offsetLeft / scaleRatio;
-                        found.y = el.offsetTop / scaleRatio;
+                        found.x = box.offsetLeft / scaleRatio;
+                        found.y = box.offsetTop / scaleRatio;
                     }
                 };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+
+            // تغيير حجم الصورة بواسطة المقبض
+            const handle = box.querySelector('.resize-handle');
+            if (handle) {
+                handle.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    let startW = box.offsetWidth;
+                    let startX = e.clientX;
+
+                    const onResize = (ev) => {
+                        const newWidth = Math.max(40, startW + (ev.clientX - startX));
+                        box.style.width = `${newWidth}px`;
+                    };
+
+                    const onStopResize = () => {
+                        window.removeEventListener('mousemove', onResize);
+                        window.removeEventListener('mouseup', onStopResize);
+
+                        const found = editsList.find(i => i.id === box.id);
+                        if (found) {
+                            found.width = box.offsetWidth / scaleRatio;
+                        }
+                    };
+
+                    window.addEventListener('mousemove', onResize);
+                    window.addEventListener('mouseup', onStopResize);
+                });
+            }
+        }
+
+        function handleImageAdd(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const itemId = 'img_' + Date.now();
+                const box = document.createElement('div');
+                box.className = 'interactive-box selected';
+                box.id = itemId;
+                box.dataset.type = 'image';
+                box.style.left = '60px';
+                box.style.top = '60px';
+                box.style.width = '140px';
+
+                const img = document.createElement('img');
+                img.src = evt.target.result;
+                img.className = 'image-inner-content';
+
+                const handle = document.createElement('div');
+                handle.className = 'resize-handle';
+
+                box.appendChild(img);
+                box.appendChild(handle);
+
+                const firstOverlay = document.querySelector('.canvas-overlay-layer');
+                if (firstOverlay) {
+                    firstOverlay.appendChild(box);
+                    selectElement(box);
+                    makeInteractive(box, 1);
+                    addToLeftPanel(itemId, 'صورة مضافة', 1);
+
+                    editsList.push({
+                        id: itemId,
+                        type: 'image',
+                        page: 1,
+                        x: 60 / scaleRatio,
+                        y: 60 / scaleRatio,
+                        width: 140 / scaleRatio,
+                        imageData: evt.target.result
+                    });
+                }
             };
+            reader.readAsDataURL(file);
         }
 
         function addToLeftPanel(id, text, pageNum) {
@@ -445,7 +539,7 @@
             row.className = 'element-row';
             row.id = `row_${id}`;
             row.innerHTML = `
-                <span><i class="fa-solid fa-font"></i> ${text} (صفحة ${pageNum})</span>
+                <span>${text} (صفحة ${pageNum})</span>
                 <i class="fa-solid fa-trash del-btn" onclick="removeItem('${id}')"></i>
             `;
             document.getElementById('addedItemsList').appendChild(row);
@@ -457,39 +551,6 @@
             const row = document.getElementById(`row_${id}`);
             if (row) row.remove();
             editsList = editsList.filter(i => i.id !== id);
-        }
-
-        function handleImageAdd(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const img = document.createElement('img');
-                img.src = evt.target.result;
-                img.style.position = 'absolute';
-                img.style.left = '50px';
-                img.style.top = '50px';
-                img.style.width = '120px';
-                img.style.cursor = 'move';
-                img.style.border = '1px dashed #e5322d';
-
-                const firstOverlay = document.querySelector('.canvas-overlay-layer');
-                if (firstOverlay) {
-                    firstOverlay.appendChild(img);
-                    makeDraggable(img, 1);
-                    editsList.push({
-                        id: 'img_' + Date.now(),
-                        type: 'image',
-                        page: 1,
-                        x: 50 / scaleRatio,
-                        y: 50 / scaleRatio,
-                        width: 120 / scaleRatio,
-                        imageData: evt.target.result
-                    });
-                }
-            };
-            reader.readAsDataURL(file);
         }
 
         async function saveAndProcessPDF() {
@@ -528,7 +589,7 @@
                             saveBtn.disabled = false;
                         } else if (jData.job.status === 'FAILED') {
                             clearInterval(timer);
-                            alert('حدث خطأ أثناء معالجة المستند: ' + jData.job.error);
+                            alert('حدث خطأ أثناء المعالجة: ' + jData.job.error);
                             saveBtn.innerHTML = 'حفظ التغييرات <i class="fa-solid fa-arrow-left"></i>';
                             saveBtn.disabled = false;
                         }
