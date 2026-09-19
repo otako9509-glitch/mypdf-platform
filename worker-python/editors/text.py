@@ -1,44 +1,70 @@
-"""
-PDF text editor module.
-Allows editing text content within PDF documents.
-"""
 import os
-from typing import Optional
+import fitz  # PyMuPDF
+import base64
+from typing import List, Dict, Any
 
 
-def edit_pdf_text(input_file: str, output_path: str, text_replacements: dict) -> bool:
+def apply_pdf_edits(input_file: str, output_path: str, edits: List[Dict[str, Any]]) -> bool:
     """
-    Edit text content in PDF.
-    
-    Args:
-        input_file: Path to the input PDF file
-        output_path: Path where the edited PDF will be saved
-        text_replacements: Dictionary mapping text to find to text to replace
-    
-    Returns:
-        True if successful, False otherwise
+    تطبيق تعديلات المستخدم: مسح/تغطية + إضافة نصوص + إدراج صور
     """
     try:
-        # Placeholder implementation
-        # In production, use libraries like PyMuPDF (fitz)
-        print(f"Editing PDF text: {input_file} -> {output_path}")
-        
         if not os.path.exists(input_file):
             raise FileNotFoundError(f"Input file not found: {input_file}")
-        
-        # This is a placeholder - actual implementation would use PyMuPDF
-        # import fitz
-        # doc = fitz.open(input_file)
-        # for page in doc:
-        #     for find_text, replace_text in text_replacements.items():
-        #         text_instances = page.search_for(find_text)
-        #         for inst in text_instances:
-        #             page.add_text_at(inst[:2], replace_text, fontname="helv")
-        # doc.save(output_path)
-        
-        print("PDF text editing - placeholder implementation")
+
+        doc = fitz.open(input_file)
+
+        for item in edits:
+            page_idx = int(item.get("page", 1)) - 1
+            if page_idx < 0 or page_idx >= len(doc):
+                continue
+
+            page = doc[page_idx]
+            edit_type = item.get("type")
+            x = float(item.get("x", 0))
+            y = float(item.get("y", 0))
+
+            # 1. التغطية البيضاء (تحديد ومسح)
+            if edit_type == "whiteout":
+                w = float(item.get("width", 100))
+                h = float(item.get("height", 24))
+                rect = fitz.Rect(x, y, x + w, y + h)
+                page.draw_rect(rect, color=(1, 1, 1), fill=(1, 1, 1))
+
+            # 2. كتابة نص جديد
+            elif edit_type == "text":
+                text = item.get("text", "")
+                font_size = float(item.get("fontSize", 16))
+                
+                # تحويل اللون من Hex إلى RGB
+                color_hex = str(item.get("color", "#000000")).lstrip('#')
+                if len(color_hex) == 6:
+                    rgb = tuple(int(color_hex[i:i+2], 16) / 255.0 for i in (0, 2, 4))
+                else:
+                    rgb = (0, 0, 0)
+                
+                point = fitz.Point(x, y + font_size)
+                page.insert_text(point, text, fontsize=font_size, color=rgb)
+
+            # 3. إدراج صورة
+            elif edit_type == "image" and "imageData" in item:
+                try:
+                    img_data = item["imageData"]
+                    if "," in img_data:
+                        img_data = img_data.split(",")[1]
+                    img_bytes = base64.b64decode(img_data)
+                    w = float(item.get("width", 120))
+                    rect = fitz.Rect(x, y, x + w, y + (w * 0.75))
+                    page.insert_image(rect, stream=img_bytes)
+                except Exception as img_err:
+                    print(f"Error inserting image: {img_err}")
+
+        # إنشاء مجلد الحفظ في حال عدم وجوده
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        doc.save(output_path)
+        doc.close()
         return True
-        
+
     except Exception as e:
-        print(f"Error editing PDF text: {str(e)}")
+        print(f"Error applying edits: {e}")
         raise e
